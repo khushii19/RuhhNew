@@ -99,7 +99,7 @@ jobs:
           fi
           SCOPE_ARG=""
           if [ -n "$VERCEL_SCOPE" ]; then SCOPE_ARG="--scope $VERCEL_SCOPE"; fi
-          npx vercel link --yes --project "$VERCEL_PROJECT" --token "$VERCEL_TOKEN" $SCOPE_ARG
+          npx --yes vercel@59 link --yes --project "$VERCEL_PROJECT" --token "$VERCEL_TOKEN" $SCOPE_ARG
 
       - name: Deploy
         if: steps.token.outputs.has_token == 'true'
@@ -137,7 +137,7 @@ jobs:
           if [ "$TARGET" = "production" ]; then ARGS+=(--prod); fi
           SCOPE_ARG=(); if [ -n "$VERCEL_SCOPE" ]; then SCOPE_ARG=(--scope "$VERCEL_SCOPE"); fi
 
-          URL=$(npx vercel deploy --yes --token "$VERCEL_TOKEN" "${SCOPE_ARG[@]}" "${ARGS[@]}")
+          URL=$(npx --yes vercel@59 deploy --yes --token "$VERCEL_TOKEN" "${SCOPE_ARG[@]}" "${ARGS[@]}")
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           {
             echo "### Deployed ($TARGET)"
