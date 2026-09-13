@@ -75,6 +75,18 @@ jobs:
         if: steps.token.outputs.has_token == 'true'
         run: npm run check
 
+      - name: Identify the Vercel account
+        if: steps.token.outputs.has_token == 'true'
+        run: |
+          SCOPE_ARG=""
+          if [ -n "$VERCEL_SCOPE" ]; then SCOPE_ARG="--scope $VERCEL_SCOPE"; fi
+          if npx --yes vercel@59 whoami --token "$VERCEL_TOKEN" $SCOPE_ARG; then
+            echo "Token authenticated."
+          else
+            echo "::error title=Vercel token rejected::VERCEL_TOKEN did not authenticate ('User not found' means the token is invalid, expired, or belongs to an account the CLI cannot resolve without a scope). Issue a fresh token at https://vercel.com/account/tokens for the account or team that owns the project, update the VERCEL_TOKEN secret, and set VERCEL_ORG_ID (and VERCEL_SCOPE for a team) so the deploy does not depend on name lookup."
+            exit 1
+          fi
+
       - name: Link the Vercel project (creates it on first run)
         if: steps.token.outputs.has_token == 'true'
         run: |
@@ -83,7 +95,7 @@ jobs:
             exit 0
           fi
           if [ -n "${VERCEL_PROJECT_ID:-}" ]; then
-            echo "::warning title=VERCEL_ORG_ID not set::Linking by project name instead of id. Add VERCEL_ORG_ID (Vercel team or user id) so the deploy targets project $VERCEL_PROJECT_ID directly."
+            echo "::warning title=VERCEL_ORG_ID not set::Falling back to linking by project name, which needs the token to resolve an account and fails with 'User not found' when it cannot. Set VERCEL_ORG_ID to target project $VERCEL_PROJECT_ID directly and skip this step."
           fi
           SCOPE_ARG=""
           if [ -n "$VERCEL_SCOPE" ]; then SCOPE_ARG="--scope $VERCEL_SCOPE"; fi
