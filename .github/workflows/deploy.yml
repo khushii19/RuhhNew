@@ -39,11 +39,11 @@ jobs:
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_SCOPE: ${{ secrets.VERCEL_SCOPE }}
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      # The CLI rejects VERCEL_PROJECT_ID unless VERCEL_ORG_ID is set too, so
-      # only export it as a pair; without the org id the link step resolves the
-      # project instead.
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_ORG_ID != '' && (secrets.VERCEL_PROJECT_ID || 'prj_8yrXBWT34sp1WQMxz83O4cx2Ptnv') || '' }}
+      # Org and project ids are identifiers, not credentials, so they are
+      # defaulted here; secrets override them. The CLI needs BOTH or it refuses
+      # to target a project, so never set one without the other.
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID || 'team_lRYOZi2Tzw8gn1uHtd0tSC2E' }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID || 'prj_8yrXBWT34sp1WQMxz83O4cx2Ptnv' }}
       VERCEL_PROJECT: ruhh
     steps:
       - uses: actions/checkout@v4
@@ -156,8 +156,23 @@ jobs:
         if: steps.token.outputs.has_token == 'true'
         run: |
           URL="${{ steps.deploy.outputs.url }}"
+          fail=0
           for path in / /menu /api/health /manifest.webmanifest; do
-            code=$(curl -s -o /dev/null -w "%{http_code}" "$URL$path")
-            echo "$path → $code"
-            case "$code" in 200|401) ;; *) echo "::error::$path returned $code"; exit 1;; esac
+            out=$(curl -s -o /dev/null -w "%{http_code} %{redirect_url}" "$URL$path")
+            code=${out%% *}
+            location=${out#* }
+            echo "$path → $code${location:+ → $location}"
+            case "$code" in
+              200|401)
+                ;;
+              3??)
+                echo "::error::$path returned $code redirecting to ${location:-an unknown location}. A redirect to vercel.com or an authentication page means Deployment Protection is enabled for this project (Vercel → Project → Settings → Deployment Protection); the site is not publicly reachable until it is turned off."
+                fail=1
+                ;;
+              *)
+                echo "::error::$path returned $code"
+                fail=1
+                ;;
+            esac
           done
+          exit "$fail"
