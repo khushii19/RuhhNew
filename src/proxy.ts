@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { env, isSupabaseConfigured } from "@/lib/env";
 
 /**
  * Refreshes the Supabase auth session cookie on admin routes so server
@@ -7,9 +8,9 @@ import { NextResponse, type NextRequest } from "next/server";
  */
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) return response;
+  if (!isSupabaseConfigured()) return response;
+  const url = env.supabaseUrl;
+  const key = env.supabaseAnonKey;
 
   const supabase = createServerClient(url, key, {
     cookies: {

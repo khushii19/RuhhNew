@@ -26,8 +26,25 @@ export const env = {
   },
 };
 
+/**
+ * A non-empty but malformed NEXT_PUBLIC_SUPABASE_URL (a placeholder left in
+ * the hosting environment, say) used to pass this check and then throw inside
+ * createClient, which fails the production build while prerendering. Treat an
+ * unusable URL as "not configured" so the app degrades instead.
+ */
 export function isSupabaseConfigured() {
-  return Boolean(env.supabaseUrl && env.supabaseAnonKey);
+  return Boolean(env.supabaseAnonKey) && isHttpUrl(env.supabaseUrl);
+}
+
+function isHttpUrl(value: string) {
+  if (!value) return false;
+  try {
+    const { protocol } = new URL(value);
+    return protocol === "https:" || protocol === "http:";
+  } catch {
+    console.warn(`Ignoring NEXT_PUBLIC_SUPABASE_URL: ${value} is not a valid URL.`);
+    return false;
+  }
 }
 
 export function isWhatsAppApiConfigured() {
