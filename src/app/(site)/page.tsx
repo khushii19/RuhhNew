@@ -49,7 +49,7 @@ export default async function HomePage() {
       {/* ---------- hero ---------- */}
       <section className="m-fade-up relative mb-6 grid items-center gap-7 pt-4 sm:grid-cols-[1.05fr_0.95fr] sm:gap-6 sm:pt-6">
         <div>
-          <div className="mb-4 flex items-center gap-2 text-[10.5px] font-bold uppercase tracking-[2.2px] text-peach-deep">
+          <div className="mb-4 flex items-center gap-2 text-[10.5px] font-bold uppercase tracking-[2.2px] text-rose-deep">
             <Sparkle size={15} weight="fill" aria-hidden="true" />
             Small batches · made to order
           </div>
@@ -101,7 +101,7 @@ export default async function HomePage() {
             aria-hidden
             className="absolute -left-3 -top-3 h-full w-full rounded-t-full rounded-b-[18px] border border-rose-deep/25"
           />
-          <div className="relative aspect-[4/5] overflow-hidden rounded-t-full rounded-b-[18px] bg-cream2 shadow-[0_24px_50px_-30px_rgba(44,26,26,0.45)]">
+          <div className="relative aspect-[4/5] overflow-hidden rounded-t-full rounded-b-[18px] bg-rose shadow-[0_24px_50px_-30px_rgba(44,26,26,0.45)]">
             <Photo
               src={settings.hero_image_url ?? categoryArt("Cheesecakes")}
               alt={

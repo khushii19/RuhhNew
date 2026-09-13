@@ -12,7 +12,8 @@ import { itemHasOptions, itemMinPrice, categoryLeadTime } from "@/lib/data";
 import { aed } from "@/lib/format";
 import type { Category, MenuItem, Settings } from "@/lib/types";
 
-const TILE_BG = ["bg-rose", "bg-lav", "bg-sage", "bg-peach"];
+/** Warm tints from the cream/rose ground, cycled so adjacent tiles differ. */
+const TILE_BG = ["bg-rose", "bg-cream2", "bg-rose/55", "bg-cream"];
 
 
 export function MenuBrowser({ items, categories, settings }: { items: MenuItem[]; categories: Category[]; settings: Settings }) {
@@ -120,7 +121,7 @@ export function MenuBrowser({ items, categories, settings }: { items: MenuItem[]
                 <div className="flex flex-1 flex-col p-2.5 px-3">
                   <div className="text-[12px] font-bold">{m.name}</div>
                   <div className="text-[11px] text-muted">{m.description}</div>
-                  {flav && <div className="mt-0.5 text-[10px] text-lav-deep">{flav}</div>}
+                  {flav && <div className="mt-0.5 text-[10px] text-muted">{flav}</div>}
                   <div className="mt-auto flex items-center justify-between pt-2">
                     <span className="text-[13px] font-bold text-rose-deep">
                       {multi && <small className="font-normal text-muted">from </small>}

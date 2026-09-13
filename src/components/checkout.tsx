@@ -261,7 +261,7 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
           </Field>
         </>
       ) : (
-        settings.pickup_address && <p className="mb-3 rounded-[10px] bg-peach p-3 text-[12px] text-peach-deep">Pickup from: {settings.pickup_address}</p>
+        settings.pickup_address && <p className="mb-3 rounded-[10px] bg-rose/50 p-3 text-[12px] text-rose-deep">Pickup from: {settings.pickup_address}</p>
       )}
 
       <Field label="Your name" error={errors.name}>

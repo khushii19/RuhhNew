@@ -10,7 +10,7 @@ export default async function CustomCakesPage() {
   return (
     <>
       <section className="mb-5 rounded-[16px] border-[1.5px] border-line bg-cream2 p-6 text-center">
-        <span className="mb-3 inline-block rounded-full bg-lav px-3 py-1 text-[10px] font-bold uppercase tracking-[2px] text-lav-deep">Made to order</span>
+        <span className="mb-3 inline-block rounded-full bg-rose px-3 py-1 text-[10px] font-bold uppercase tracking-[2px] text-rose-deep">Made to order</span>
         <h1 className="mb-1.5 text-[24px] leading-tight">
           Custom cakes for <span className="italic text-rose-deep">your moments</span>
         </h1>

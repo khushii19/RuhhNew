@@ -22,7 +22,7 @@
   --color-rose-clay: #b8707c;
   --color-surface: #ffffff;
   --color-on-accent: #ffffff;
-  --font-serif: var(--font-dm-sans), "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-body: var(--font-dm-sans), "DM Sans", "Helvetica Neue", Arial, sans-serif;
   --radius-card: 16px;
   --radius-sm: 10px;
 }
@@ -86,7 +86,7 @@ html {
 body {
   background: var(--color-cream);
   color: var(--color-ink);
-  font-family: var(--font-serif);
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
 }
 

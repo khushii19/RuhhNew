@@ -165,7 +165,7 @@ export function TrackOrder({ settings }: { settings: Settings }) {
             </div>
           )}
 
-          <div className="mb-4 rounded-[10px] bg-peach p-3 text-[12px] leading-[1.6] text-peach-deep">
+          <div className="mb-4 rounded-[10px] bg-rose/50 p-3 text-[12px] leading-[1.6] text-rose-deep">
             {order.status === "delivered"
               ? "Delivered. Hope you enjoyed it!"
               : order.status === "pending"

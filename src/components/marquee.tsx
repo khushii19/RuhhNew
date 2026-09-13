@@ -7,7 +7,7 @@ export function Marquee({ items }: { items: string[] }) {
       <div className="marquee-track flex w-max gap-8 pl-8">
         {row.map((t, i) => (
           <span key={i} className="flex items-center gap-8 whitespace-nowrap text-[11px] uppercase tracking-[2.5px] text-rose-deep/80">
-            {t} <span className="text-peach-mid">✦</span>
+            {t} <span className="text-rose-mid">✦</span>
           </span>
         ))}
       </div>
