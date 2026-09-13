@@ -40,7 +40,10 @@ jobs:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_SCOPE: ${{ secrets.VERCEL_SCOPE }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID || 'prj_8yrXBWT34sp1WQMxz83O4cx2Ptnv' }}
+      # The CLI rejects VERCEL_PROJECT_ID unless VERCEL_ORG_ID is set too, so
+      # only export it as a pair; without the org id the link step resolves the
+      # project instead.
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_ORG_ID != '' && (secrets.VERCEL_PROJECT_ID || 'prj_8yrXBWT34sp1WQMxz83O4cx2Ptnv') || '' }}
       VERCEL_PROJECT: ruhh
     steps:
       - uses: actions/checkout@v4
@@ -94,9 +97,7 @@ jobs:
             echo "Deploying into project $VERCEL_PROJECT_ID via VERCEL_ORG_ID; no link step needed."
             exit 0
           fi
-          if [ -n "${VERCEL_PROJECT_ID:-}" ]; then
-            echo "::warning title=VERCEL_ORG_ID not set::Falling back to linking by project name, which needs the token to resolve an account and fails with 'User not found' when it cannot. Set VERCEL_ORG_ID to target project $VERCEL_PROJECT_ID directly and skip this step."
-          fi
+          echo "::warning title=VERCEL_ORG_ID not set::Linking by the project name \"$VERCEL_PROJECT\", which CREATES a new project when no project of that name exists. Set VERCEL_ORG_ID (with VERCEL_PROJECT_ID) to deploy into a specific existing project instead."
           SCOPE_ARG=""
           if [ -n "$VERCEL_SCOPE" ]; then SCOPE_ARG="--scope $VERCEL_SCOPE"; fi
           npx --yes vercel@59 link --yes --project "$VERCEL_PROJECT" --token "$VERCEL_TOKEN" $SCOPE_ARG
