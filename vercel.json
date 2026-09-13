@@ -1,3 +1,5 @@
 {
+  "framework": "nextjs",
+  "installCommand": "npm ci",
   "crons": [{ "path": "/api/health", "schedule": "0 3 * * *" }]
 }
