@@ -6,17 +6,14 @@ import { useCart } from "@/components/cart-context";
 import { aed } from "@/lib/format";
 import type { Special } from "@/lib/types";
 
-const ACCENT = {
-  rose: { bg: "bg-rose", text: "text-rose-deep" },
-  lav: { bg: "bg-lav", text: "text-lav-deep" },
-  sage: { bg: "bg-sage", text: "text-sage-deep" },
-  peach: { bg: "bg-peach", text: "text-peach-deep" },
-};
-
+/**
+ * A featured special. Specials still carry an `accent` in the data, but the
+ * storefront no longer tints by it: the options were lavender, sage and
+ * peach, which pulled the page off its cream and rose ground.
+ */
 export function SpecialCard({ special: s, leadTimeHours }: { special: Special; leadTimeHours: number }) {
   const { add } = useCart();
   const router = useRouter();
-  const a = ACCENT[s.accent] ?? ACCENT.rose;
 
   function order() {
     add({
@@ -33,24 +30,24 @@ export function SpecialCard({ special: s, leadTimeHours }: { special: Special; l
   }
 
   return (
-    <div className="lift mb-3.5 flex items-center gap-4 rounded-[16px] border border-line bg-surface p-4">
-      <div className={`relative flex h-[72px] w-[72px] shrink-0 items-center justify-center overflow-hidden rounded-[12px] text-[30px] ${a.bg}`}>
-        {s.image_url ? <Photo src={s.image_url} alt={s.name} fill sizes="72px" className="object-cover" /> : s.emoji}
+    <article className="lift grid h-full overflow-hidden rounded-[16px] border border-line bg-surface sm:grid-cols-[0.9fr_1.1fr]">
+      <div className="relative flex aspect-[4/3] items-center justify-center bg-rose text-[48px] sm:aspect-auto sm:min-h-[260px]">
+        {s.image_url ? <Photo src={s.image_url} alt={s.name} fill sizes="(max-width: 640px) 100vw, 280px" className="object-cover" /> : s.emoji}
       </div>
-      <div className="min-w-0 flex-1">
-        <h3 className="mb-0.5 text-[15px]">
-          {s.name}
-          {s.tag && <span className={`tag ml-1.5 ${a.bg} ${a.text}`}>{s.tag}</span>}
-        </h3>
-        <p className="mb-2 text-[12px] leading-[1.6] text-muted">{s.description}</p>
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="font-display text-[17px] text-rose-deep">{aed(s.price_aed)}</span>
-          {s.old_price_aed != null && <span className="text-[12px] text-muted line-through">{aed(s.old_price_aed)}</span>}
-          <button onClick={order} className="btn-p press ml-auto px-3.5 py-1.5 text-[11.5px]" disabled={s.price_aed <= 0}>
+      <div className="flex flex-col p-6">
+        {s.tag && <span className="tag mb-3 self-start bg-rose text-rose-deep">{s.tag}</span>}
+        <h3 className="text-[22px] leading-tight">{s.name}</h3>
+        <p className="mt-2 text-[14px] leading-relaxed text-muted">{s.description}</p>
+        <div className="mt-auto flex items-center justify-between gap-3 pt-6">
+          <span className="flex items-baseline gap-2">
+            <span className="font-display text-[22px] text-rose-deep">{aed(s.price_aed)}</span>
+            {s.old_price_aed != null && <span className="text-[13px] text-muted line-through">{aed(s.old_price_aed)}</span>}
+          </span>
+          <button onClick={order} className="btn-p press px-5 py-2.5 text-[13px]" disabled={s.price_aed <= 0}>
             Order now
           </button>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

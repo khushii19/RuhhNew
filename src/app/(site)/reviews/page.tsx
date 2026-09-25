@@ -12,7 +12,7 @@ export default async function ReviewsPage() {
   const [reviews, settings] = await Promise.all([getApprovedReviews(50), getSettings()]);
   const avg = reviews.length ? reviews.reduce((a, r) => a + r.rating, 0) / reviews.length : 0;
   return (
-    <>
+    <div className="mx-auto w-full max-w-2xl">
       <h2 className="sec-head">Reviews</h2>
       {reviews.length > 0 && (
         <div className="mb-4 flex items-center gap-3 rounded-[12px] bg-cream2 p-4">
@@ -42,6 +42,6 @@ export default async function ReviewsPage() {
       <Suspense fallback={<div className="card p-4 text-[12px] text-muted">Loading…</div>}>
         <ReviewForm ownerName={settings.owner_name} />
       </Suspense>
-    </>
+    </div>
   );
 }

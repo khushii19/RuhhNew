@@ -83,6 +83,16 @@ html {
   --color-on-accent: #1c1315;
 }
 
+/* .bleed bands span the viewport from inside the centred main column; clip
+   keeps the extra scrollbar width from causing a horizontal scroll without
+   creating a scroll container (which would break the sticky header). */
+body {
+  overflow-x: clip;
+}
+.bleed {
+  margin-inline: calc(50% - 50vw);
+}
+
 body {
   background: var(--color-cream);
   color: var(--color-ink);
@@ -332,18 +342,21 @@ h3,
   }
 }
 
+/* The page wrapper holds fixed overlays (toast, cart bar, item picker), so
+   its enter animation must leave nothing behind: a transform, even an
+   identity one, makes it their containing block, and a forwards fill keeps
+   it a stacking context beneath the sticky header and tab bar. Hence
+   opacity only, filled backwards. */
 @keyframes page-in {
   from {
     opacity: 0;
-    transform: translateY(6px);
   }
   to {
     opacity: 1;
-    transform: none;
   }
 }
 .m-page {
-  animation: page-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: page-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 @media print {

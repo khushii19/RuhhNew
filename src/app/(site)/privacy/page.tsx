@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Privacy" };
 export default async function PrivacyPage() {
   const s = await getSettings();
   return (
-    <article className="prose-ruhh">
+    <article className="prose-ruhh mx-auto w-full max-w-2xl">
       <h1 className="mb-1 text-[24px]">Privacy notice</h1>
       <p className="mb-5 text-[12px] text-muted">Last updated September 2026</p>
       <h2>What we collect</h2>

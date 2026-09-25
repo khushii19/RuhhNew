@@ -9,8 +9,10 @@ export const metadata: Metadata = { title: "Track your order" };
 export default async function TrackPage() {
   const settings = await getSettings();
   return (
-    <Suspense fallback={<div className="p-10 text-center text-[13px] text-muted">Loading…</div>}>
-      <TrackOrder settings={settings} />
-    </Suspense>
+    <div className="mx-auto w-full max-w-2xl">
+      <Suspense fallback={<div className="p-10 text-center text-[13px] text-muted">Loading…</div>}>
+        <TrackOrder settings={settings} />
+      </Suspense>
+    </div>
   );
 }

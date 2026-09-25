@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "Custom cakes" };
 export default async function CustomCakesPage() {
   const settings = await getSettings();
   return (
-    <>
+    <div className="mx-auto w-full max-w-2xl">
       <section className="mb-5 rounded-[16px] border-[1.5px] border-line bg-cream2 p-6 text-center">
         <span className="mb-3 inline-block rounded-full bg-rose px-3 py-1 text-[10px] font-bold uppercase tracking-[2px] text-rose-deep">Made to order</span>
         <h1 className="mb-1.5 text-[24px] leading-tight">
@@ -20,6 +20,6 @@ export default async function CustomCakesPage() {
         </p>
       </section>
       <EnquiryForm settings={settings} />
-    </>
+    </div>
   );
 }

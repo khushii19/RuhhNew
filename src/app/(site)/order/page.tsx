@@ -7,5 +7,9 @@ export const metadata: Metadata = { title: "Order" };
 
 export default async function OrderPage() {
   const [settings, zones] = await Promise.all([getSettings(), getZones()]);
-  return <Checkout settings={settings} zones={zones} />;
+  return (
+    <div className="mx-auto w-full max-w-2xl">
+      <Checkout settings={settings} zones={zones} />
+    </div>
+  );
 }
