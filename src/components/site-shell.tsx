@@ -11,13 +11,22 @@ export function SiteShell({ settings, children }: { settings: Settings; children
   return (
     <CartProvider>
       <div className="flex min-h-[100dvh] flex-col">
-        <header className="sticky top-0 z-40 border-b border-line bg-cream/90 backdrop-blur-md">
-          <div className="mx-auto flex h-16 max-w-6xl items-center gap-10 px-5 md:h-[72px] md:px-8">
-            <Link href="/" className="flex shrink-0 items-center" aria-label={`${settings.business_name} home`}>
-              <BrandLogo url={settings.logo_url} height={40} />
-            </Link>
+        <p className="bg-ink px-5 py-2 text-center text-[11.5px] tracking-[0.06em] text-cream/85">
+          Handmade to order in Dubai
+          <span className="mx-2 text-cream/40" aria-hidden>
+            ·
+          </span>
+          Order {settings.default_lead_time_hours} hours ahead
+        </p>
+        <header className="sticky top-0 z-40 border-b border-line bg-cream/92 backdrop-blur-md">
+          {/* Nav, centred logo, cart: the boutique arrangement on desktop.
+              Phones keep logo and cart; sections live in the tab bar. */}
+          <div className="mx-auto grid h-16 max-w-6xl grid-cols-[1fr_auto] items-center px-5 md:h-[84px] md:grid-cols-[1fr_auto_1fr] md:px-8">
             <DesktopNav />
-            <div className="ml-auto">
+            <Link href="/" className="flex items-center md:justify-self-center" aria-label={`${settings.business_name} home`}>
+              <BrandLogo url={settings.logo_url} height={46} />
+            </Link>
+            <div className="justify-self-end">
               <CartPill />
             </div>
           </div>

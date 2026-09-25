@@ -11,7 +11,8 @@ export default async function MenuPage() {
   return (
     <>
       <header className="m-fade-up mb-8 md:mb-12">
-        <h1 className="text-[36px] leading-[1.1] tracking-[-0.015em] md:text-[48px]">The menu</h1>
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-rose-clay">Baked to order</p>
+        <h1 className="text-[40px] leading-[1.05] tracking-[-0.02em] md:text-[56px]">The menu</h1>
         <p className="mt-3 max-w-[52ch] text-[15px] leading-relaxed text-muted md:text-[16px]">
           Pick a treat and a size. Everything is baked fresh for the date you choose.
         </p>

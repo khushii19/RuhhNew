@@ -202,6 +202,8 @@ export interface CartLine {
   // display snapshot
   name: string;
   emoji: string;
+  /** Product photo for the cart thumbnail; older saved carts lack it. */
+  image?: string | null;
   sizeLabel: string;
   unitPrice: number;
   leadTimeHours: number;

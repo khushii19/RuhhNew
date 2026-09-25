@@ -59,6 +59,7 @@ export function MenuBrowser({ items, categories, settings }: { items: MenuItem[]
       qty: 1,
       name: m.name,
       emoji: m.emoji,
+      image: m.image_url,
       sizeLabel: s.label,
       unitPrice: Number(s.price_aed),
       leadTimeHours: categoryLeadTime(category, settings),
@@ -138,7 +139,7 @@ export function MenuBrowser({ items, categories, settings }: { items: MenuItem[]
               </button>
             </div>
           ) : (
-            <div key={`${cat}-${q}`} className="m-stagger mb-20 grid grid-cols-2 md:mb-0 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6">
+            <div key={`${cat}-${q}`} className="m-stagger mb-20 grid grid-cols-2 gap-x-4 gap-y-9 md:mb-0 md:grid-cols-3 md:gap-x-6 md:gap-y-12">
               {list.map((m, i) => {
                 const multi = m.item_sizes.length > 1;
                 const flav = m.item_flavours.slice(0, 3).map((f) => f.name).join(", ") + (m.item_flavours.length > 3 ? "\u2026" : "");
@@ -150,36 +151,38 @@ export function MenuBrowser({ items, categories, settings }: { items: MenuItem[]
                     onClick={() => choose(m)}
                     onKeyDown={(e) => e.key === "Enter" && choose(m)}
                     style={{ "--i": Math.min(i, 12) } as React.CSSProperties}
-                    className="card lift group flex cursor-pointer flex-col overflow-hidden hover:border-rose-mid"
+                    className="group flex cursor-pointer flex-col rounded-[14px] outline-offset-4"
                   >
-                    <div className={`relative aspect-square overflow-hidden ${TILE_BG[i % 4]}`}>
+                    <div className={`relative aspect-[4/5] overflow-hidden rounded-[14px] ${TILE_BG[i % 4]}`}>
                       <Photo
                         src={m.image_url ?? categoryArt(catName(m.category_id))}
                         alt={m.name}
                         fill
                         sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 300px"
-                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                       />
+                      <button
+                        aria-label={itemHasOptions(m) ? `Choose options for ${m.name}` : `Add ${m.name} to cart`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          choose(m);
+                        }}
+                        className={`press absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full text-[19px] leading-none shadow-[0_8px_18px_-8px_rgba(44,26,26,0.5)] transition ${
+                          flash === m.id ? "m-pop bg-sage text-sage-deep" : "bg-surface text-ink group-hover:bg-rose-deep group-hover:text-on-accent"
+                        }`}
+                      >
+                        {flash === m.id ? "\u2713" : "+"}
+                      </button>
                     </div>
-                    <div className="flex flex-1 flex-col p-3.5 md:p-4">
-                      <div className="text-[14px] font-semibold leading-snug md:text-[15px]">{m.name}</div>
-                      <div className="mt-0.5 line-clamp-2 text-[12.5px] leading-snug text-muted md:text-[13px]">{m.description}</div>
+                    <div className="mt-3.5 flex flex-1 flex-col">
+                      <div className="flex items-baseline justify-between gap-3">
+                        <div className="font-display text-[16.5px] leading-snug transition-colors group-hover:text-rose-deep md:text-[18px]">{m.name}</div>
+                      </div>
+                      <div className="mt-1 line-clamp-2 text-[13px] leading-snug text-muted">{m.description}</div>
                       {flav && <div className="mt-1 line-clamp-1 text-[12px] text-lav-deep">{flav}</div>}
-                      <div className="mt-auto flex items-center justify-between pt-3">
-                        <span className="text-[14px] font-semibold text-rose-deep md:text-[15px]">
-                          {multi && <span className="font-normal text-muted">from </span>}
-                          {aed(itemMinPrice(m))}
-                        </span>
-                        <button
-                          aria-label={itemHasOptions(m) ? `Choose options for ${m.name}` : `Add ${m.name} to cart`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            choose(m);
-                          }}
-                          className={`press flex h-8 w-8 items-center justify-center rounded-full text-[17px] leading-none transition ${flash === m.id ? "m-pop bg-sage text-sage-deep" : "bg-rose-deep text-on-accent"}`}
-                        >
-                          {flash === m.id ? "\u2713" : "+"}
-                        </button>
+                      <div className="mt-2 text-[14px] font-semibold text-ink">
+                        {multi && <span className="font-normal text-muted">From </span>}
+                        {aed(itemMinPrice(m))}
                       </div>
                     </div>
                   </div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { WhatsAppIcon } from "@/components/icons";
+import { Cake } from "@phosphor-icons/react";
 import { addDays, todayISO } from "@/lib/availability";
 import { isValidPhone, waLink } from "@/lib/format";
 import type { Settings } from "@/lib/types";
@@ -64,9 +65,9 @@ export function EnquiryForm({ settings }: { settings: Settings }) {
   if (done) {
     return (
       <div className="rounded-[16px] border-[1.5px] border-sage-mid bg-sage/40 p-7 text-center">
-        <div className="mb-2 text-[40px]">🎂</div>
-        <h2 className="mb-1 text-[18px] font-bold">Enquiry sent!</h2>
-        <p className="mb-3 text-[13px] text-muted">{settings.owner_name} will reply on WhatsApp with a quote. If WhatsApp didn&apos;t open, tap below.</p>
+        <Cake size={40} className="mx-auto text-sage-deep" aria-hidden />
+        <h2 className="mb-2 mt-3 text-[26px]">Enquiry sent</h2>
+        <p className="mx-auto mb-5 max-w-[42ch] text-[14.5px] leading-relaxed text-muted">{settings.owner_name} will reply on WhatsApp with a quote. If WhatsApp didn&apos;t open, tap below.</p>
         <a href={waLink(settings.whatsapp_number, waText())} target="_blank" rel="noopener noreferrer" className="btn-wa">
           <WhatsAppIcon /> Open WhatsApp
         </a>
@@ -75,8 +76,8 @@ export function EnquiryForm({ settings }: { settings: Settings }) {
   }
 
   return (
-    <form onSubmit={submit} className="card p-4">
-      <div className="grid gap-3 sm:grid-cols-2">
+    <form onSubmit={submit} className="card p-5 md:p-7">
+      <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label className="label">Your name</label>
           <input className={`field ${errors.name ? "field-err" : ""}`} value={form.name} onChange={set("name")} />

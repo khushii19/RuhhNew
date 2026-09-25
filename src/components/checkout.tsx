@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useCart } from "@/components/cart-context";
 import { WhatsAppIcon } from "@/components/icons";
+import { Photo } from "@/components/photo";
+import { Basket, Car, ChatCircleDots, Gift, Sparkle, Storefront } from "@phosphor-icons/react";
 import { Confetti } from "@/components/confetti";
 import { availableDates } from "@/lib/availability";
 import { aed, fmtDate, isValidPhone } from "@/lib/format";
@@ -136,8 +138,8 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
             <path d="M5 12l5 5L20 7" className="check-draw" />
           </svg>
         </div>
-        <h2 className="m-fade-up m-delay-1 mb-1 text-[22px] font-bold">Order {o.ref} placed!</h2>
-        <p className="mb-1 text-[13px] leading-[1.6] text-muted">
+        <h2 className="m-fade-up m-delay-1 mb-2 text-[28px]">Thank you. Order {o.ref} is in.</h2>
+        <p className="mx-auto mb-2 max-w-[46ch] text-[14.5px] leading-relaxed text-muted">
           {settings.owner_name} has your order for {fmtDate(o.slot_date)}, {o.slot_label}. WhatsApp should have opened with the details ready to send. If it did not, tap the button below.
         </p>
         {o.payment_method === "bank_transfer" && settings.bank_details && (
@@ -165,14 +167,11 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
 
   if (!cart.lines.length) {
     return (
-      <div className="p-10 text-center">
-        <div className="mb-2 text-[40px]">🧁</div>
-        <p className="mb-4 text-[13px] leading-[1.6] text-muted">
-          Your cart is empty.
-          <br />
-          Browse {settings.business_name}&apos;s menu and add something with soul!
-        </p>
-        <Link href="/menu" className="btn-p">
+      <div className="rounded-[14px] border border-dashed border-line px-6 py-14 text-center">
+        <Basket size={36} className="mx-auto text-rose-clay" aria-hidden />
+        <p className="mt-4 font-display text-[22px]">Your cart is empty</p>
+        <p className="mx-auto mt-2 max-w-[36ch] text-[14.5px] leading-relaxed text-muted">Pick something from the menu and it will wait for you here.</p>
+        <Link href="/menu" className="btn-p press mt-6 px-7 py-3.5 text-[14.5px] font-semibold">
           Browse the menu
         </Link>
       </div>
@@ -184,12 +183,14 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
       <h2 className="sec-head">Your cart</h2>
       <div className="mb-4">
         {cart.lines.map((l) => (
-          <div key={l.key} className="card m-fade-up mb-2 flex items-center gap-3 p-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] bg-cream2 text-[22px]">{l.emoji}</div>
+          <div key={l.key} className="card m-fade-up mb-2.5 flex items-center gap-4 p-3">
+            <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-cream2 text-[24px]">
+              {l.image ? <Photo src={l.image} alt="" fill sizes="64px" className="object-cover" /> : l.emoji}
+            </div>
             <div className="min-w-0 flex-1">
-              <div className="text-[13px] font-bold">{l.name}</div>
-              {lineDisplay(l) && <div className="text-[11px] text-lav-deep">{lineDisplay(l)}</div>}
-              <div className="text-[11px] text-muted">{aed(l.unitPrice)} each</div>
+              <div className="font-display text-[16px] leading-snug">{l.name}</div>
+              {lineDisplay(l) && <div className="mt-0.5 text-[12.5px] text-lav-deep">{lineDisplay(l)}</div>}
+              <div className="mt-0.5 text-[12.5px] text-muted">{aed(l.unitPrice)} each</div>
             </div>
             <div className="flex items-center gap-2">
               <button className="qbtn" aria-label="Decrease quantity" onClick={() => cart.setQty(l.key, l.qty - 1)}>
@@ -204,11 +205,11 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
         ))}
       </div>
 
-      <div className="mb-5 rounded-[12px] bg-cream2 p-4 text-[12px]">
+      <div className="mb-8 rounded-[14px] bg-cream2 p-5 text-[13.5px]">
         {cart.lines.map((l) => (
           <div key={l.key} className="flex justify-between py-0.5">
             <span>
-              {l.emoji} {l.name}
+              {l.name}
               {lineDisplay(l) ? ` (${lineDisplay(l)})` : ""} ×{l.qty}
             </span>
             <span>{aed(l.unitPrice * l.qty)}</span>
@@ -218,7 +219,7 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
           <span>Delivery</span>
           <span>{mode === "pickup" ? "Free (pickup)" : deliveryFee ? aed(deliveryFee) : zone ? "Free" : "-"}</span>
         </div>
-        <div className="mt-1 flex justify-between border-t border-line pt-2 text-[14px] font-bold text-rose-deep">
+        <div className="mt-2 flex justify-between border-t border-line pt-3 text-[16px] font-semibold text-ink">
           <span>Total</span>
           <span>{aed(total)}</span>
         </div>
@@ -228,18 +229,18 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
       <div className="mb-3 grid grid-cols-2 gap-2.5">
         {(
           [
-            ["delivery", "🚗", "Delivery", "Fee by area"],
-            ["pickup", "🏠", "Pickup", "Free"],
+            ["delivery", Car, "Delivery", "Fee by area"],
+            ["pickup", Storefront, "Pickup", "Free"],
           ] as const
-        ).map(([m, icon, label, sub]) => (
+        ).map(([m, Icon, label, sub]) => (
           <button
             key={m}
             onClick={() => setMode(m)}
-            className={`rounded-[12px] border-[1.5px] bg-surface p-3 text-center transition ${mode === m ? "border-rose-deep bg-rose/40" : "border-line"}`}
+            className={`flex flex-col items-center rounded-[14px] border-[1.5px] bg-surface p-4 text-center transition ${mode === m ? "border-rose-deep bg-rose/40" : "border-line"}`}
           >
-            <div className="text-[22px]">{icon}</div>
-            <div className="text-[13px] font-bold">{label}</div>
-            <div className="text-[11px] text-muted">{sub}</div>
+            <Icon size={24} weight={mode === m ? "fill" : "regular"} className={mode === m ? "text-rose-deep" : "text-ink/70"} aria-hidden />
+            <div className="mt-1.5 text-[14px] font-semibold">{label}</div>
+            <div className="text-[12px] text-muted">{sub}</div>
           </button>
         ))}
       </div>
@@ -271,7 +272,7 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
         <input className={`field ${errors.phone ? "field-err" : ""}`} type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+971 50 000 0000" autoComplete="tel" />
       </Field>
 
-      <h2 className="sec-head mt-4">Pick a date &amp; time</h2>
+      <h2 className="sec-head">Pick a date &amp; time</h2>
       {cart.leadHours > 0 && (
         <p className="mb-2 text-[11px] text-muted">Items in your cart need {cart.leadHours} hours notice, so the earliest date is shown first.</p>
       )}
@@ -295,7 +296,7 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
         <textarea className="field min-h-[70px]" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={`Allergies, dedications, anything for ${settings.owner_name} to know...`} />
       </Field>
 
-      <Toggle on={isGift} onChange={setIsGift} icon="🎁" title="This is a gift" sub="Add a handwritten card and we won't include prices" />
+      <Toggle on={isGift} onChange={setIsGift} icon={<Gift size={22} aria-hidden />} title="This is a gift" sub="Add a handwritten card and we won't include prices" />
       {isGift && (
         <div className="mb-3 rounded-[12px] border border-line bg-surface p-3">
           <Field label="Recipient's name">
@@ -307,7 +308,7 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
         </div>
       )}
 
-      <h2 className="sec-head mt-4">Payment</h2>
+      <h2 className="sec-head">Payment</h2>
       <div className="mb-3 grid gap-2">
         {settings.accept_cash && <Radio checked={payment === "cash"} onChange={() => setPayment("cash")} title="Cash on delivery / pickup" sub="Pay when your order arrives" />}
         {settings.accept_bank_transfer && (
@@ -315,9 +316,9 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
         )}
       </div>
 
-      <h2 className="sec-head mt-4">Notifications</h2>
-      <Toggle on={waUpdates} onChange={setWaUpdates} icon="💬" title="WhatsApp updates" sub="Order confirmed, baking, out for delivery" />
-      <Toggle on={marketing} onChange={setMarketing} icon="✨" title="Weekly specials" sub={`${settings.owner_name} messages when something new is baking`} />
+      <h2 className="sec-head">Notifications</h2>
+      <Toggle on={waUpdates} onChange={setWaUpdates} icon={<ChatCircleDots size={22} aria-hidden />} title="WhatsApp updates" sub="Order confirmed, baking, out for delivery" />
+      <Toggle on={marketing} onChange={setMarketing} icon={<Sparkle size={22} aria-hidden />} title="Weekly specials" sub={`${settings.owner_name} messages when something new is baking`} />
 
       <div className="absolute -left-[9999px] top-0" aria-hidden="true">
         <label>
@@ -338,21 +339,21 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
 
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
-    <div className="mb-3">
+    <div className="mb-4">
       <label className="label">{label}</label>
       {children}
-      {error && <p className="mt-1 text-[11px] text-danger">{error}</p>}
+      {error && <p className="mt-1.5 text-[12.5px] text-danger">{error}</p>}
     </div>
   );
 }
 
-function Toggle({ on, onChange, icon, title, sub }: { on: boolean; onChange: (v: boolean) => void; icon: string; title: string; sub: string }) {
+function Toggle({ on, onChange, icon, title, sub }: { on: boolean; onChange: (v: boolean) => void; icon: React.ReactNode; title: string; sub: string }) {
   return (
-    <div className="card mb-2 flex items-center gap-3 p-3">
-      <div className="text-[20px]">{icon}</div>
+    <div className="card mb-2.5 flex items-center gap-3.5 p-4">
+      <div className="text-rose-deep">{icon}</div>
       <div className="flex-1">
-        <div className="text-[13px] font-bold">{title}</div>
-        <div className="text-[11px] text-muted">{sub}</div>
+        <div className="text-[14px] font-semibold">{title}</div>
+        <div className="text-[12.5px] text-muted">{sub}</div>
       </div>
       <button
         role="switch"
@@ -369,11 +370,11 @@ function Toggle({ on, onChange, icon, title, sub }: { on: boolean; onChange: (v:
 
 function Radio({ checked, onChange, title, sub }: { checked: boolean; onChange: () => void; title: string; sub: string }) {
   return (
-    <label className={`card flex cursor-pointer items-center gap-3 p-3 ${checked ? "border-rose-deep" : ""}`}>
+    <label className={`card flex cursor-pointer items-center gap-3.5 p-4 ${checked ? "border-rose-deep" : ""}`}>
       <input type="radio" name="payment" checked={checked} onChange={onChange} className="accent-rose-deep" />
       <div>
-        <div className="text-[13px] font-bold">{title}</div>
-        <div className="text-[11px] text-muted">{sub}</div>
+        <div className="text-[14px] font-semibold">{title}</div>
+        <div className="text-[12.5px] text-muted">{sub}</div>
       </div>
     </label>
   );

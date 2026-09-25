@@ -78,9 +78,8 @@ export function TrackOrder({ settings }: { settings: Settings }) {
 
   return (
     <>
-      <h2 className="sec-head">Track your order</h2>
       <form
-        className="card mb-4 p-4"
+        className="card mb-4 p-5 md:p-7"
         onSubmit={(e) => {
           e.preventDefault();
           lookup(ref, phone);
@@ -90,7 +89,7 @@ export function TrackOrder({ settings }: { settings: Settings }) {
         <input className="field mb-3" value={ref} onChange={(e) => setRef(e.target.value)} placeholder="RUH-1042" />
         <label className="label">WhatsApp number used</label>
         <input className="field mb-3" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+971 50 000 0000" />
-        <button className="btn-p w-full rounded-[10px]" disabled={loading}>
+        <button className="btn-p w-full py-3.5 text-[14.5px] font-semibold" disabled={loading}>
           {loading ? "Looking up…" : "Find my order"}
         </button>
         {error && <p className="mt-2 text-[12px] text-danger">{error}</p>}

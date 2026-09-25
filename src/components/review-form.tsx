@@ -41,7 +41,7 @@ export function ReviewForm({ ownerName }: { ownerName: string }) {
   }
 
   return (
-    <form onSubmit={submit} className="card p-4">
+    <form onSubmit={submit} className="card p-5 md:p-7">
       <label className="label">Your name</label>
       <input className="field mb-3" value={name} onChange={(e) => setName(e.target.value)} />
       <label className="label">Rating</label>
@@ -70,7 +70,7 @@ export function ReviewForm({ ownerName }: { ownerName: string }) {
         </label>
       </div>
       {error && <p className="mb-2 text-[12px] text-danger">{error}</p>}
-      <button className="btn-p w-full rounded-[10px]" disabled={busy}>
+      <button className="btn-p w-full py-3.5 text-[14.5px] font-semibold" disabled={busy}>
         {busy ? "Sending…" : "Submit review"}
       </button>
     </form>

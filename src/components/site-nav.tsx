@@ -13,14 +13,14 @@ function isActive(path: string, href: string) {
 const DESKTOP_LINKS = [
   { href: "/menu", label: "Menu" },
   { href: "/custom-cakes", label: "Custom cakes" },
-  { href: "/track", label: "Track order" },
   { href: "/reviews", label: "Reviews" },
+  { href: "/track", label: "Track order" },
 ];
 
 export function DesktopNav() {
   const path = usePathname();
   return (
-    <nav aria-label="Main" className="hidden items-center gap-7 md:flex">
+    <nav aria-label="Main" className="hidden items-center gap-6 md:flex lg:gap-8">
       {DESKTOP_LINKS.map((l) => {
         const active = isActive(path, l.href);
         return (
@@ -28,7 +28,7 @@ export function DesktopNav() {
             key={l.href}
             href={l.href}
             aria-current={active ? "page" : undefined}
-            className={`relative py-1 text-[14px] transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:bg-rose-deep after:transition-transform ${
+            className={`relative py-1 text-[13.5px] tracking-[0.02em] transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:bg-rose-deep after:transition-transform ${
               active ? "text-rose-deep after:scale-x-100" : "text-ink/75 after:scale-x-0 hover:text-rose-deep hover:after:scale-x-100"
             }`}
           >
@@ -45,14 +45,14 @@ export function CartPill() {
   return (
     <Link
       href="/order"
-      className="press flex shrink-0 items-center gap-2 rounded-full bg-rose-deep py-2 pl-4 pr-2 text-[13px] text-on-accent transition hover:opacity-90"
+      className="press flex shrink-0 items-center gap-2 rounded-full border border-ink/15 py-1.5 pl-3.5 pr-1.5 text-[13px] text-ink transition hover:border-rose-deep hover:text-rose-deep"
       aria-label={`View cart, ${hydrated ? count : 0} items`}
     >
-      <Basket size={16} weight="bold" aria-hidden />
+      <Basket size={17} aria-hidden />
       Cart
       <span
         key={hydrated ? count : -1}
-        className={`flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-on-accent px-1.5 text-[11px] font-bold text-rose-deep ${hydrated && count > 0 ? "m-bump" : ""}`}
+        className={`flex h-[24px] min-w-[24px] items-center justify-center rounded-full bg-rose-deep px-1.5 text-[11px] font-bold text-on-accent ${hydrated && count > 0 ? "m-bump" : ""}`}
       >
         {hydrated ? count : 0}
       </span>

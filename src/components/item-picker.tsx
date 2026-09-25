@@ -61,6 +61,7 @@ export function ItemPicker({
       qty,
       name: m.name,
       emoji: m.emoji,
+      image: m.image_url,
       sizeLabel: size.label,
       unitPrice: unit,
       leadTimeHours,
