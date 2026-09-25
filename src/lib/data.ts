@@ -1,6 +1,7 @@
 import { publicClient } from "@/lib/supabase/public";
 import { isSupabaseConfigured } from "@/lib/env";
 import type { Category, DeliveryZone, MenuItem, Review, Settings, Special } from "@/lib/types";
+import { SEED_ABOUT, SEED_HERO, seedPhoto } from "@/lib/seed-photos";
 
 const DEFAULT_SETTINGS: Settings = {
   id: 1,
@@ -41,7 +42,14 @@ export function normalizeSettings(row: Partial<Settings> | null | undefined): Se
 export async function getSettings(): Promise<Settings> {
   if (!isSupabaseConfigured()) return normalizeSettings(null);
   const { data } = await publicClient().from("settings").select("*").eq("id", 1).maybeSingle();
-  return normalizeSettings(data);
+  const s = normalizeSettings(data);
+  // Storefront only: the admin form reads normalizeSettings directly, so it
+  // still shows an empty photo slot instead of saving the launch photo back.
+  if (data) {
+    s.hero_image_url ||= SEED_HERO;
+    s.about_image_url ||= SEED_ABOUT;
+  }
+  return s;
 }
 
 export async function getCategories(): Promise<Category[]> {
@@ -53,6 +61,7 @@ export async function getCategories(): Promise<Category[]> {
 function sortItem(m: MenuItem): MenuItem {
   return {
     ...m,
+    image_url: m.image_url || seedPhoto(m.name),
     item_sizes: [...(m.item_sizes ?? [])]
       .map((s) => ({ ...s, price_aed: Number(s.price_aed) }))
       .sort((a, b) => a.sort_order - b.sort_order),
@@ -81,6 +90,7 @@ export async function getSpecials(): Promise<Special[]> {
     .order("sort_order");
   return ((data ?? []) as Special[]).map((s) => ({
     ...s,
+    image_url: s.image_url || seedPhoto(s.name),
     price_aed: Number(s.price_aed),
     old_price_aed: s.old_price_aed == null ? null : Number(s.old_price_aed),
   }));

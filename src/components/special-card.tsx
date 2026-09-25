@@ -6,11 +6,14 @@ import { useCart } from "@/components/cart-context";
 import { aed } from "@/lib/format";
 import type { Special } from "@/lib/types";
 
-/**
- * A featured special. Specials still carry an `accent` in the data, but the
- * storefront no longer tints by it: the options were lavender, sage and
- * peach, which pulled the page off its cream and rose ground.
- */
+/** Each special carries a pastel accent chosen in admin. */
+const ACCENT: Record<string, { bg: string; text: string }> = {
+  rose: { bg: "bg-rose", text: "text-rose-deep" },
+  lav: { bg: "bg-lav", text: "text-lav-deep" },
+  sage: { bg: "bg-sage", text: "text-sage-deep" },
+  peach: { bg: "bg-peach", text: "text-peach-deep" },
+};
+
 export function SpecialCard({ special: s, leadTimeHours }: { special: Special; leadTimeHours: number }) {
   const { add } = useCart();
   const router = useRouter();
@@ -29,15 +32,16 @@ export function SpecialCard({ special: s, leadTimeHours }: { special: Special; l
     router.push("/order");
   }
 
+  const a = ACCENT[s.accent] ?? ACCENT.rose;
   return (
-    <article className="lift grid h-full overflow-hidden rounded-[16px] border border-line bg-surface sm:grid-cols-[0.9fr_1.1fr]">
-      <div className="relative flex aspect-[4/3] items-center justify-center bg-rose text-[48px] sm:aspect-auto sm:min-h-[260px]">
+    <article className={`lift grid h-full overflow-hidden rounded-[16px] sm:grid-cols-[0.9fr_1.1fr] ${a.bg}`}>
+      <div className="relative flex aspect-[4/3] items-center justify-center text-[48px] sm:aspect-auto sm:min-h-[240px]">
         {s.image_url ? <Photo src={s.image_url} alt={s.name} fill sizes="(max-width: 640px) 100vw, 280px" className="object-cover" /> : s.emoji}
       </div>
       <div className="flex flex-col p-6">
-        {s.tag && <span className="tag mb-3 self-start bg-rose text-rose-deep">{s.tag}</span>}
+        {s.tag && <span className={`tag mb-3 self-start bg-surface/70 ${a.text}`}>{s.tag}</span>}
         <h3 className="text-[22px] leading-tight">{s.name}</h3>
-        <p className="mt-2 text-[14px] leading-relaxed text-muted">{s.description}</p>
+        <p className="mt-2 line-clamp-2 text-[14px] leading-relaxed text-ink/70">{s.description}</p>
         <div className="mt-auto flex items-center justify-between gap-3 pt-6">
           <span className="flex items-baseline gap-2">
             <span className="font-display text-[22px] text-rose-deep">{aed(s.price_aed)}</span>

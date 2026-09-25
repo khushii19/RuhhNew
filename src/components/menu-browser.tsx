@@ -13,8 +13,8 @@ import { itemHasOptions, itemMinPrice, categoryLeadTime } from "@/lib/data";
 import { aed } from "@/lib/format";
 import type { Category, MenuItem, Settings } from "@/lib/types";
 
-/** Warm tints from the cream/rose ground, cycled so adjacent tiles differ. */
-const TILE_BG = ["bg-rose", "bg-cream2", "bg-rose/55", "bg-cream"];
+/** Pastel grounds behind each photo, cycled so adjacent tiles differ. */
+const TILE_BG = ["bg-rose", "bg-lav", "bg-sage", "bg-peach"];
 
 
 export function MenuBrowser({ items, categories, settings }: { items: MenuItem[]; categories: Category[]; settings: Settings }) {
@@ -152,19 +152,19 @@ export function MenuBrowser({ items, categories, settings }: { items: MenuItem[]
                     style={{ "--i": Math.min(i, 12) } as React.CSSProperties}
                     className="card lift group flex cursor-pointer flex-col overflow-hidden hover:border-rose-mid"
                   >
-                    <div className={`relative aspect-[4/3] overflow-hidden ${TILE_BG[i % 4]}`}>
+                    <div className={`relative aspect-square overflow-hidden ${TILE_BG[i % 4]}`}>
                       <Photo
                         src={m.image_url ?? categoryArt(catName(m.category_id))}
                         alt={m.name}
                         fill
-                        sizes="(max-width: 768px) 50vw, 300px"
+                        sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 300px"
                         className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                       />
                     </div>
                     <div className="flex flex-1 flex-col p-3.5 md:p-4">
                       <div className="text-[14px] font-semibold leading-snug md:text-[15px]">{m.name}</div>
-                      <div className="mt-0.5 text-[12.5px] leading-snug text-muted md:text-[13px]">{m.description}</div>
-                      {flav && <div className="mt-1 text-[12px] text-muted">{flav}</div>}
+                      <div className="mt-0.5 line-clamp-2 text-[12.5px] leading-snug text-muted md:text-[13px]">{m.description}</div>
+                      {flav && <div className="mt-1 line-clamp-1 text-[12px] text-lav-deep">{flav}</div>}
                       <div className="mt-auto flex items-center justify-between pt-3">
                         <span className="text-[14px] font-semibold text-rose-deep md:text-[15px]">
                           {multi && <span className="font-normal text-muted">from </span>}
