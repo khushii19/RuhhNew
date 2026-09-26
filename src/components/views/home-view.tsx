@@ -1,19 +1,21 @@
 import Link from "next/link";
-import { Basket, Cake, CalendarCheck, ChatCircleDots, Cookie, Moped, Sparkle } from "@phosphor-icons/react/dist/ssr";
+import { ArrowRight, CalendarCheck, ChatCircleDots, Moped, Storefront } from "@phosphor-icons/react/dist/ssr";
 import { BrandSeal } from "@/components/brand-logo";
-import { HomeShop } from "@/components/home-shop";
+import { HomeBestsellers } from "@/components/home-shop";
 import { MenuUnavailable } from "@/components/menu-unavailable";
 import { Photo } from "@/components/photo";
 import { Reveal, RevealGroup } from "@/components/reveal";
 import { SpecialCard } from "@/components/special-card";
 import { SpecialsButton } from "@/components/specials-sheet";
 import { WhatsAppButton } from "@/components/whatsapp-button";
+import { categoryArt } from "@/lib/category-art";
 import { getFeatured } from "@/lib/data";
 import { env } from "@/lib/env";
-import { aed } from "@/lib/format";
 import type { Category, MenuItem, Settings, Special } from "@/lib/types";
 
 export type HomeData = { settings: Settings; specials: Special[]; items: MenuItem[]; categories: Category[] };
+
+const TILE_BG = ["bg-rose", "bg-lav", "bg-sage", "bg-peach"];
 
 /** The home page body. The route fetches the data; the view only renders it. */
 export function HomeView({ settings, specials, items, categories }: HomeData) {
@@ -24,117 +26,145 @@ export function HomeView({ settings, specials, items, categories }: HomeData) {
     items.filter((m) => !specialNames.has(m.name.trim().toLowerCase())),
     4,
   );
+  // One tile per category, pictured by its first bake with a photo.
+  const shelves = categories
+    .map((c) => {
+      const list = items.filter((m) => m.category_id === c.id);
+      return { cat: c, count: list.length, photo: list.find((m) => m.image_url)?.image_url ?? null };
+    })
+    .filter((s) => s.count > 0);
   const pickup = settings.pickup_address?.split(",")[0]?.trim();
-  const payments = [settings.accept_cash && "cash", settings.accept_bank_transfer && "bank transfer"].filter(Boolean).join(" or ");
-  const special = specials[0];
 
   return (
     <div className="mx-auto w-full max-w-[1080px]">
       <BakeryJsonLd settings={settings} />
 
-      {/* ---------- hero: the first build's cream card, now with the photo beside it ---------- */}
-      <section className="m-fade-up overflow-hidden rounded-[20px] border-[1.5px] border-line bg-cream2">
-        <div className="grid items-center md:grid-cols-[1fr_1.05fr]">
-          <div className="relative order-1 p-3 md:order-2 md:p-5 md:pl-0">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-[14px] bg-rose md:aspect-[5/4]">
-              {settings.hero_image_url && (
-                <Photo
-                  src={settings.hero_image_url}
-                  alt={`Freshly baked ${settings.business_name} cookies`}
-                  fill
-                  priority
-                  sizes="(max-width: 768px) 100vw, 540px"
-                  className="hero-zoom object-cover"
-                />
-              )}
-              {special && (
-                <span className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-surface/95 px-3 py-1.5 text-[12px] text-ink shadow-[0_8px_20px_-10px_rgba(44,26,26,0.45)]">
-                  <Sparkle size={14} weight="fill" className="text-rose-deep" aria-hidden />
-                  This week: {special.name}
-                  {special.price_aed > 0 && <span className="price font-semibold">· {aed(special.price_aed)}</span>}
-                </span>
-              )}
-            </div>
-            {/* The Ruhh seal, pinned to the photo's corner. */}
-            <div className="m-float absolute -bottom-7 left-7 rounded-full bg-surface p-1 shadow-[0_14px_30px_-14px_rgba(155,75,107,0.6)] md:-left-9 md:bottom-10">
-              <BrandSeal size={88} />
-            </div>
+      {/* ---------- hero: photo and words, no box around them ---------- */}
+      <section className="grid items-center gap-7 md:grid-cols-[1fr_1.05fr] md:gap-14">
+        <div className="relative md:order-2">
+          <div className="relative aspect-[5/4] overflow-hidden rounded-[26px] bg-rose md:aspect-[4/5]">
+            {settings.hero_image_url && (
+              <Photo
+                src={settings.hero_image_url}
+                alt={`Freshly baked ${settings.business_name} cookies`}
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, 540px"
+                className="hero-zoom object-cover"
+              />
+            )}
           </div>
+          <div className="m-float absolute -bottom-6 right-5 rounded-full bg-surface p-1 shadow-[0_16px_34px_-14px_rgba(155,75,107,0.55)] md:-left-10 md:bottom-12 md:right-auto">
+            <BrandSeal size={84} />
+          </div>
+        </div>
 
-          <div className="order-2 px-6 pb-9 pt-12 text-center md:order-1 md:px-12 md:py-14 md:text-left">
-            <span className="inline-block rounded-full bg-rose px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.18em] text-rose-deep">Home baked · Dubai</span>
-            <h1 className="mt-4 pb-1 text-[38px] leading-[1.1] md:text-[56px]">
-              Baked to <em className="font-normal italic text-rose-deep">perfection</em>.
-            </h1>
-            <p className="mx-auto mt-3 max-w-[40ch] text-[15px] leading-relaxed text-muted md:mx-0 md:text-[16.5px]">
-              Handmade cookies, cheesecakes &amp; tiramisu, made slowly and from the heart by {owner}.
-            </p>
-            <p className="mt-2 text-[12.5px] tracking-[0.06em] text-lav-deep">— by {owner} · est. 2019 —</p>
-            <div className="mt-6 flex flex-wrap justify-center gap-2.5 md:justify-start">
-              <a href="#shop" className="btn-p press px-6 py-3 text-[14.5px] font-semibold">
-                <Basket size={17} weight="bold" aria-hidden /> Order now
-              </a>
-              <SpecialsButton specials={specials} settings={settings} className="btn-o press px-6 py-2.5 text-[14.5px] font-semibold" />
-            </div>
+        <div className="m-fade-up text-center md:order-1 md:text-left">
+          <p className="text-[13px] font-medium tracking-[0.02em] text-rose-deep">Home baked in Dubai · since 2019</p>
+          <h1 className="mt-3 text-[42px] leading-[1.05] tracking-[-0.01em] md:text-[64px]">
+            Baked to <em className="font-normal italic text-rose-deep">perfection</em>.
+          </h1>
+          <p className="mx-auto mt-4 max-w-[34ch] text-[16px] leading-relaxed text-ink/70 md:mx-0 md:text-[17.5px]">
+            Cookies, cheesecakes &amp; tiramisu, made slowly and from the heart by {owner}.
+          </p>
+          <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row md:justify-start">
+            <Link href="/menu" className="btn-p press w-full px-8 py-4 text-[15px] font-semibold sm:w-auto">
+              Order now <ArrowRight size={17} weight="bold" aria-hidden />
+            </Link>
+            {specials.length > 0 && (
+              <SpecialsButton
+                specials={specials}
+                settings={settings}
+                className="press rounded-full px-5 py-3 text-[14.5px] font-semibold text-rose-deep underline-offset-4 hover:underline"
+              />
+            )}
           </div>
         </div>
       </section>
 
-      {/* ---------- the practical benefits ---------- */}
-      <RevealGroup className="mt-5 grid grid-cols-2 gap-2.5 md:mt-6 md:grid-cols-4 md:gap-4">
-        {[
-          { Icon: CalendarCheck, title: "Baked to order", sub: `Fresh for your date · ${settings.default_lead_time_hours}h notice`, tone: "bg-rose", icon: "text-rose-deep" },
-          { Icon: Moped, title: "Delivered in Dubai", sub: pickup ? `Or free pickup in ${pickup}` : "Or free pickup", tone: "bg-sage", icon: "text-sage-deep" },
-          { Icon: Cookie, title: "Mix your own box", sub: "Pick every flavour yourself", tone: "bg-peach", icon: "text-peach-deep" },
-          { Icon: ChatCircleDots, title: "Order on WhatsApp", sub: `${owner} confirms personally`, tone: "bg-lav", icon: "text-lav-deep" },
-        ].map(({ Icon, title, sub, tone, icon }, i) => (
-          <div key={title} style={{ "--i": i } as React.CSSProperties} className={`flex h-full flex-col gap-2 rounded-[16px] p-4 md:p-5 ${tone}`}>
-            <span className={`flex h-10 w-10 items-center justify-center rounded-full bg-surface ${icon}`}>
-              <Icon size={20} weight="duotone" aria-hidden />
-            </span>
-            <span className="font-display text-[15.5px] leading-snug md:text-[17px]">{title}</span>
-            <span className="text-[12.5px] leading-snug text-ink/70">{sub}</span>
-          </div>
-        ))}
-      </RevealGroup>
+      {/* ---------- the practical promises, in one soft band ---------- */}
+      <Reveal>
+        <div className="bleed mt-14 bg-rose md:mt-16">
+          <ul className="mx-auto grid max-w-[1080px] grid-cols-2 gap-x-4 gap-y-4 px-5 py-6 md:grid-cols-4 md:px-6 md:py-7">
+            {[
+              { Icon: CalendarCheck, text: `Baked fresh to order · ${settings.default_lead_time_hours}h notice` },
+              { Icon: Moped, text: "Delivery across Dubai" },
+              { Icon: Storefront, text: pickup ? `Free pickup in ${pickup}` : "Free pickup" },
+              { Icon: ChatCircleDots, text: `${owner} confirms on WhatsApp` },
+            ].map(({ Icon, text }) => (
+              <li key={text} className="flex items-center gap-3 text-[13.5px] font-medium leading-snug text-rose-deep">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface">
+                  <Icon size={20} weight="duotone" aria-hidden />
+                </span>
+                {text}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Reveal>
 
-      {/* ---------- this week's specials ---------- */}
-      <Section title="This week’s specials" kicker="Fresh this week">
-        {specials.length ? (
-          <RevealGroup className="grid gap-3 md:grid-cols-2 md:gap-4">
+      {/* ---------- this week ---------- */}
+      {specials.length > 0 && (
+        <Section title="This week’s specials">
+          <RevealGroup className="grid gap-3 md:grid-cols-2 md:gap-5">
             {specials.map((s, i) => (
               <div key={s.id} style={{ "--i": i } as React.CSSProperties}>
                 <SpecialCard special={s} leadTimeHours={settings.default_lead_time_hours} />
               </div>
             ))}
           </RevealGroup>
-        ) : (
-          <p className="text-[13.5px] text-muted">No specials this week — check back soon.</p>
-        )}
-      </Section>
+        </Section>
+      )}
 
-      {/* ---------- the whole menu ---------- */}
-      <Section title="The menu" kicker="Tap + to add" action={<Link href="/menu" className="text-[13px] font-semibold text-rose-deep underline-offset-4 hover:underline">Search the menu →</Link>}>
-        {items.length > 0 ? (
-          <HomeShop items={items} featured={featured} categories={categories} settings={settings} />
+      {/* ---------- bestsellers ---------- */}
+      <Section title="Bestsellers" link={{ href: "/menu", label: "Full menu" }}>
+        {featured.length > 0 ? (
+          <HomeBestsellers items={featured} categories={categories} settings={settings} />
         ) : (
           <MenuUnavailable ownerName={owner} whatsappNumber={settings.whatsapp_number} />
         )}
       </Section>
 
-      {/* ---------- how ordering works ---------- */}
-      <Section title="How ordering works" kicker="Three easy steps">
-        <RevealGroup className="grid gap-3 md:grid-cols-3 md:gap-4">
+      {/* ---------- shop by category ---------- */}
+      {shelves.length > 0 && (
+        <Section title="Shop by treat">
+          <RevealGroup className="grid grid-cols-2 gap-x-3 gap-y-6 md:grid-cols-3 md:gap-x-5 md:gap-y-8">
+            {shelves.map(({ cat, count, photo }, i) => (
+              <Link key={cat.id} href={`/menu?cat=${cat.id}`} style={{ "--i": i } as React.CSSProperties} className="group block">
+                <span className={`relative block aspect-[4/3] overflow-hidden rounded-[20px] ${TILE_BG[i % 4]}`}>
+                  <Photo
+                    src={photo ?? categoryArt(cat.name)}
+                    alt=""
+                    fill
+                    sizes="(max-width: 768px) 50vw, 340px"
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+                  />
+                </span>
+                <span className="mt-2.5 flex items-baseline justify-between gap-2 px-0.5">
+                  <span className="font-display text-[16px] leading-snug text-ink transition-colors group-hover:text-rose-deep md:text-[18px]">{cat.name}</span>
+                  <span className="shrink-0 text-[12.5px] text-muted">
+                    {count} {count === 1 ? "bake" : "bakes"}
+                  </span>
+                </span>
+              </Link>
+            ))}
+          </RevealGroup>
+        </Section>
+      )}
+
+      {/* ---------- how it works ---------- */}
+      <Section title="How ordering works">
+        <RevealGroup className="grid gap-6 md:grid-cols-3 md:gap-10">
           {[
-            { title: "Pick your treats", sub: "Choose sizes and flavours, or mix your own box." },
-            { title: "Choose a date", sub: `Delivery across Dubai or free pickup, ${settings.default_lead_time_hours} hours ahead.` },
-            { title: "Send on WhatsApp", sub: `${owner} confirms and bakes it fresh.${payments ? ` Pay by ${payments}.` : ""}` },
+            { title: "Pick your treats", sub: "Choose a size, a flavour, or mix your own box." },
+            { title: "Choose a day", sub: `Delivery across Dubai or free pickup, ${settings.default_lead_time_hours} hours ahead.` },
+            { title: "Send on WhatsApp", sub: `${owner} confirms and bakes it fresh for you.` },
           ].map((step, i) => (
-            <div key={step.title} style={{ "--i": i } as React.CSSProperties} className="flex gap-4 rounded-[16px] border border-line bg-surface p-5">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-deep font-display text-[18px] text-white">{i + 1}</span>
+            <div key={step.title} style={{ "--i": i } as React.CSSProperties} className="flex gap-4">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-rose font-display text-[19px] text-rose-deep">{i + 1}</span>
               <span>
-                <span className="block font-display text-[17px] leading-snug">{step.title}</span>
-                <span className="mt-1 block text-[13.5px] leading-relaxed text-muted">{step.sub}</span>
+                <span className="block font-display text-[18px] leading-snug">{step.title}</span>
+                <span className="mt-1 block text-[14px] leading-relaxed text-ink/65">{step.sub}</span>
               </span>
             </div>
           ))}
@@ -143,22 +173,20 @@ export function HomeView({ settings, specials, items, categories }: HomeData) {
 
       {/* ---------- the baker ---------- */}
       <Reveal>
-        <section aria-labelledby="hello-title" className="mt-14 grid items-center gap-7 overflow-hidden rounded-[20px] bg-rose p-4 md:mt-20 md:grid-cols-[0.9fr_1.1fr] md:gap-12 md:p-6">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-[14px] bg-lav md:aspect-[5/6]">
-            {settings.about_image_url && <Photo src={settings.about_image_url} alt={`${owner} baking`} fill sizes="(max-width: 768px) 100vw, 460px" className="object-cover" />}
+        <section aria-labelledby="hello-title" className="mt-16 grid items-center gap-8 md:mt-24 md:grid-cols-2 md:gap-14">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-[26px] bg-lav md:aspect-square">
+            {settings.about_image_url && <Photo src={settings.about_image_url} alt={`${owner} baking`} fill sizes="(max-width: 768px) 100vw, 520px" className="object-cover" />}
           </div>
-          <div className="px-2 pb-4 text-center md:pr-8 md:text-left">
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-rose-deep">The baker behind Ruhh</p>
-            <h2 id="hello-title" className="mt-3 text-[30px] leading-[1.12] md:text-[42px]">
-              Say hello to {owner}
+          <div className="text-center md:text-left">
+            <h2 id="hello-title" className="text-[32px] leading-[1.1] md:text-[44px]">
+              Say hello to <em className="font-normal italic text-rose-deep">{owner}</em>
             </h2>
-            {settings.about_text && <p className="mx-auto mt-4 max-w-[46ch] font-display text-[17px] italic leading-[1.65] text-ink/80 md:mx-0 md:text-[19px]">{settings.about_text}</p>}
-            <div className="mt-6 flex flex-col items-center gap-4 sm:flex-row md:justify-start">
-              <BrandSeal size={72} variant="primary" className="bg-cream" />
+            {settings.about_text && <p className="mx-auto mt-4 max-w-[44ch] font-display text-[18px] italic leading-[1.65] text-ink/75 md:mx-0 md:text-[20px]">{settings.about_text}</p>}
+            <div className="mt-7 flex justify-center md:justify-start">
               <WhatsAppButton
                 number={settings.whatsapp_number}
                 message={`Hi ${owner}! I found ${settings.business_name} and would love to know more.`}
-                className="press inline-flex items-center gap-2 rounded-full bg-[#15803d] px-5 py-3 text-[14px] font-semibold text-white transition hover:brightness-110"
+                className="press inline-flex items-center gap-2 rounded-full bg-[#15803d] px-6 py-3.5 text-[14.5px] font-semibold text-white transition hover:brightness-110"
               >
                 Chat with {owner}
               </WhatsAppButton>
@@ -169,35 +197,35 @@ export function HomeView({ settings, specials, items, categories }: HomeData) {
 
       {/* ---------- custom cakes ---------- */}
       <Reveal>
-        <section className="mt-5 flex flex-col items-center gap-5 rounded-[20px] border-[1.5px] border-dashed border-peach-mid bg-peach px-6 py-9 text-center md:flex-row md:justify-between md:px-10 md:text-left">
-          <div className="flex flex-col items-center gap-4 md:flex-row">
-            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-surface text-peach-deep">
-              <Cake size={28} weight="duotone" aria-hidden />
-            </span>
-            <div>
-              <h2 className="text-[24px] leading-tight md:text-[28px]">Planning a celebration?</h2>
-              <p className="mt-1 text-[14px] text-ink/70">Birthdays, anniversaries and showers, designed with {owner}.</p>
-            </div>
-          </div>
-          <Link href="/custom-cakes" className="btn-p press shrink-0 px-6 py-3 text-[14.5px] font-semibold">
-            Design a custom cake
-          </Link>
-        </section>
+        <Link
+          href="/custom-cakes"
+          className="group mt-16 flex items-center justify-between gap-5 rounded-[26px] bg-lav px-6 py-8 transition-colors hover:bg-rose md:mt-24 md:px-12 md:py-12"
+        >
+          <span>
+            <span className="block font-display text-[26px] leading-tight text-ink md:text-[36px]">Planning a celebration?</span>
+            <span className="mt-1.5 block text-[14.5px] text-ink/65">Custom cakes, designed with {owner}.</span>
+          </span>
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-rose-deep text-white transition-transform group-hover:translate-x-1">
+            <ArrowRight size={22} weight="bold" aria-hidden />
+            <span className="sr-only">Design a custom cake</span>
+          </span>
+        </Link>
       </Reveal>
     </div>
   );
 }
 
-function Section({ title, kicker, action, children }: { title: string; kicker?: string; action?: React.ReactNode; children: React.ReactNode }) {
+function Section({ title, link, children }: { title: string; link?: { href: string; label: string }; children: React.ReactNode }) {
   return (
     <section className="mt-14 md:mt-20">
       <Reveal>
-        <div className="mb-5 flex items-end justify-between gap-4">
-          <div>
-            {kicker && <p className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-rose-deep">{kicker}</p>}
-            <h2 className="text-[28px] leading-tight md:text-[36px]">{title}</h2>
-          </div>
-          {action}
+        <div className="mb-5 flex items-baseline justify-between gap-4 md:mb-7">
+          <h2 className="text-[27px] leading-tight md:text-[36px]">{title}</h2>
+          {link && (
+            <Link href={link.href} className="inline-flex shrink-0 items-center gap-1 text-[14px] font-semibold text-rose-deep underline-offset-4 hover:underline">
+              {link.label} <ArrowRight size={14} weight="bold" aria-hidden />
+            </Link>
+          )}
         </div>
       </Reveal>
       {children}

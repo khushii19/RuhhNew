@@ -1,6 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
+import { Toast, type ToastMessage } from "@/components/toast";
 import { Photo } from "@/components/photo";
 import { useCart } from "@/components/cart-context";
 import { aed } from "@/lib/format";
@@ -35,35 +37,44 @@ export function useOrderSpecial(leadTimeHours: number) {
   };
 }
 
-/** The first build's special card: dashed accent border, pastel image tile, one action. */
+/** A special: dashed accent border, photo, one "Add" that keeps you browsing. */
 export function SpecialCard({ special: s, leadTimeHours }: { special: Special; leadTimeHours: number }) {
-  const order = useOrderSpecial(leadTimeHours);
+  const { add } = useCart();
+  const [toast, setToast] = useState<ToastMessage | null>(null);
+  const clearToast = useCallback(() => setToast(null), []);
   const a = ACCENT[s.accent] ?? ACCENT.rose;
+
+  function addIt() {
+    if (s.price_aed <= 0) return;
+    add({ kind: "special", specialId: s.id, qty: 1, name: s.name, emoji: s.emoji, image: s.image_url, sizeLabel: "", unitPrice: s.price_aed, leadTimeHours });
+    setToast({ text: `Added ${s.name}`, action: { label: "View basket", href: "/order" } });
+  }
+
   return (
-    <article className={`flex gap-3.5 rounded-[16px] border-[1.5px] border-dashed bg-surface p-3.5 ${a.border}`}>
-      <div className={`relative flex h-[92px] w-[92px] shrink-0 items-center justify-center overflow-hidden rounded-[12px] text-[40px] ${a.bg}`}>
-        {s.image_url ? <Photo src={s.image_url} alt={s.name} fill sizes="92px" className="object-cover" /> : <span aria-hidden>{s.emoji}</span>}
+    <article className={`flex items-center gap-4 rounded-[20px] border-[1.5px] border-dashed bg-surface p-3 pr-4 ${a.border}`}>
+      <div className={`relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-[14px] text-[40px] md:h-28 md:w-28 ${a.bg}`}>
+        {s.image_url ? <Photo src={s.image_url} alt={s.name} fill sizes="112px" className="object-cover" /> : <span aria-hidden>{s.emoji}</span>}
       </div>
-      <div className="flex min-w-0 flex-1 flex-col">
-        <h3 className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[17px] leading-snug">
-          {s.name}
-          {s.tag && <span className={`tag font-body uppercase tracking-[0.08em] ${a.bg} ${a.text}`}>{s.tag}</span>}
-        </h3>
-        {s.description && <p className="mt-1 line-clamp-2 text-[12.5px] leading-relaxed text-muted">{s.description}</p>}
-        <div className="mt-auto flex items-center gap-2 pt-2">
-          <span className={`price text-[15px] font-semibold ${a.text}`}>{aed(s.price_aed)}</span>
-          {s.old_price_aed != null && <span className="price text-[12.5px] text-muted line-through">{aed(s.old_price_aed)}</span>}
+      <div className="min-w-0 flex-1">
+        {s.tag && <span className={`tag mb-1.5 uppercase tracking-[0.08em] ${a.bg} ${a.text}`}>{s.tag}</span>}
+        <h3 className="text-[18px] leading-snug">{s.name}</h3>
+        <div className="mt-2 flex items-center justify-between gap-2">
+          <span className="flex items-baseline gap-2">
+            <span className="price text-[15px] font-semibold text-ink">{aed(s.price_aed)}</span>
+            {s.old_price_aed != null && <span className="price text-[12.5px] text-muted line-through">{aed(s.old_price_aed)}</span>}
+          </span>
           <button
             type="button"
-            onClick={() => order(s)}
+            onClick={addIt}
             disabled={s.price_aed <= 0}
-            aria-label={`Order ${s.name} now`}
-            className={`press ml-auto whitespace-nowrap rounded-full px-4 py-2 text-[12.5px] font-semibold text-white transition hover:brightness-110 disabled:opacity-50 ${a.btn}`}
+            aria-label={`Add ${s.name} to basket`}
+            className={`press whitespace-nowrap rounded-full px-4 py-2 text-[13px] font-semibold text-white transition hover:brightness-110 disabled:opacity-50 ${a.btn}`}
           >
-            Order now
+            Add
           </button>
         </div>
       </div>
+      <Toast message={toast} onDone={clearToast} />
     </article>
   );
 }

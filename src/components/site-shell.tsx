@@ -11,20 +11,6 @@ export function SiteShell({ settings, children }: { settings: Settings; children
   return (
     <CartProvider>
       <div className="flex min-h-[100dvh] flex-col">
-        {/* The practical facts, before anything else. */}
-        <p className="bg-rose px-4 py-2 text-center text-[11.5px] tracking-[0.03em] text-rose-deep">
-          Handmade to order in Dubai
-          <span className="mx-2 opacity-50" aria-hidden>
-            ·
-          </span>
-          Order {settings.default_lead_time_hours} hours ahead
-          <span className="hidden sm:inline">
-            <span className="mx-2 opacity-50" aria-hidden>
-              ·
-            </span>
-            Delivery or free pickup
-          </span>
-        </p>
         <header className="sticky top-0 z-40 border-b border-line bg-surface/95 backdrop-blur-md">
           <div className="mx-auto flex h-16 max-w-[1080px] items-center justify-between gap-4 px-4 md:px-6">
             <Link href="/" className="flex min-w-0 items-center gap-3" aria-label={`${settings.business_name} home`}>

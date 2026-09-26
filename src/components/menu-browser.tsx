@@ -93,7 +93,7 @@ export function MenuBrowser({ items, categories, settings }: { items: MenuItem[]
           </button>
         </div>
       ) : (
-        <div key={`${cat}-${q}`} className="m-stagger grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5 lg:grid-cols-4">
+        <div key={`${cat}-${q}`} className="m-stagger grid grid-cols-2 gap-x-3 gap-y-7 md:grid-cols-3 md:gap-x-5 md:gap-y-9 lg:grid-cols-4">
           {list.map((m, i) => (
             <div key={m.id} style={{ "--i": Math.min(i, 12) } as React.CSSProperties}>
               <ProductCard

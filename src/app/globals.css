@@ -22,7 +22,7 @@
   --color-rose-clay: #b8707c;
   --color-surface: #ffffff;
   --color-on-accent: #ffffff;
-  --font-body: var(--font-lora), Georgia, "Times New Roman", serif;
+  --font-body: var(--font-dm-sans), "Helvetica Neue", Arial, sans-serif;
   --radius-card: 16px;
   --radius-sm: 10px;
 }
@@ -90,7 +90,7 @@ body {
   .label {
     @apply mb-1.5 block text-[13px] font-medium text-ink/80;
   }
-  /* Prices: Lora defaults to old-style figures, which make
+  /* Prices: lining, even-width figures, which make
      "AED 85" dip and wobble in columns. */
   .price {
     font-variant-numeric: lining-nums tabular-nums;

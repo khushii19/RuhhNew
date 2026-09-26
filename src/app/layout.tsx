@@ -1,11 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Lora } from "next/font/google";
+import { DM_Sans, Lora } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { env } from "@/lib/env";
 
-// One warm serif for the whole storefront, like the first build's Georgia.
-const lora = Lora({ subsets: ["latin"], style: ["normal", "italic"], weight: ["400", "500", "600", "700"], variable: "--font-lora", display: "swap" });
+// A warm serif for headings and bake names, and a clean sans for everything
+// small (prices, labels, buttons), where a serif at 12–14px reads poorly.
+const lora = Lora({ subsets: ["latin"], style: ["normal", "italic"], weight: ["400", "500", "600"], variable: "--font-lora", display: "swap" });
+const sans = DM_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-dm-sans", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(env.siteUrl),
@@ -32,7 +34,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={lora.variable}>
+    <html lang="en" className={`${lora.variable} ${sans.variable}`}>
       <body>
         {children}
         <Analytics />

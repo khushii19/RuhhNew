@@ -228,50 +228,36 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
 
   return (
     <>
-      <div className="mb-4">
+      <ul className="card mb-3 divide-y divide-line overflow-hidden">
         {cart.lines.map((l, i) => (
-          <div key={l.key} className="card m-fade-up mb-2.5 flex items-center gap-3.5 p-3">
-            <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-rose text-[24px]">
-              {l.image ? <Photo src={l.image} alt="" fill sizes="64px" className="object-cover" /> : l.emoji}
+          <li key={l.key} className="flex gap-3.5 p-3.5">
+            <div className="relative flex h-[72px] w-[72px] shrink-0 items-center justify-center overflow-hidden rounded-[12px] bg-rose text-[26px]">
+              {l.image ? <Photo src={l.image} alt="" fill sizes="72px" className="object-cover" /> : l.emoji}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="font-display text-[15.5px] leading-snug">{l.name}</div>
-              {lineDisplay(l) && <div className="mt-0.5 text-[12.5px] text-lav-deep">{lineDisplay(l)}</div>}
-              <div className="price mt-0.5 text-[12.5px] text-muted">{aed(l.unitPrice)} each</div>
+              <div className="font-display text-[16px] leading-snug">{l.name}</div>
+              {lineDisplay(l) && <div className="mt-0.5 text-[12.5px] leading-snug text-lav-deep">{lineDisplay(l)}</div>}
+              <div className="mt-2 flex items-center justify-between gap-3">
+                <span className="price text-[14px] font-semibold">{aed(l.unitPrice * l.qty)}</span>
+                <div className="flex items-center gap-1 rounded-full border border-line p-0.5">
+                  <button type="button" className="flex h-8 w-8 items-center justify-center rounded-full text-[17px] text-rose-deep hover:bg-rose" aria-label={l.qty > 1 ? `Fewer ${l.name}` : `Remove ${l.name}`} onClick={() => decrease(l, i)}>
+                    −
+                  </button>
+                  <span className="price w-6 text-center text-[14px] font-semibold">{l.qty}</span>
+                  <button type="button" className="flex h-8 w-8 items-center justify-center rounded-full text-[17px] text-rose-deep hover:bg-rose" aria-label={`More ${l.name}`} onClick={() => cart.setQty(l.key, Math.min(50, l.qty + 1))}>
+                    +
+                  </button>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-1.5">
-              <button type="button" className="qbtn h-9 w-9" aria-label={l.qty > 1 ? `Fewer ${l.name}` : `Remove ${l.name}`} onClick={() => decrease(l, i)}>
-                −
-              </button>
-              <span className="price w-6 text-center text-[14px] font-bold">{l.qty}</span>
-              <button type="button" className="qbtn h-9 w-9" aria-label={`More ${l.name}`} onClick={() => cart.setQty(l.key, Math.min(50, l.qty + 1))}>
-                +
-              </button>
-            </div>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
+      <Link href="/menu" className="inline-flex text-[13.5px] font-semibold text-rose-deep underline-offset-4 hover:underline">
+        + Add more treats
+      </Link>
 
-      <div className="mb-8 rounded-[14px] bg-peach p-5 text-[13.5px] text-peach-deep">
-        {cart.lines.map((l) => (
-          <div key={l.key} className="flex justify-between gap-4 py-0.5">
-            <span className="min-w-0">
-              {l.name} ×{l.qty}
-            </span>
-            <span className="price shrink-0">{aed(l.unitPrice * l.qty)}</span>
-          </div>
-        ))}
-        <div className="mt-1.5 flex justify-between border-t border-peach-mid/40 pt-1.5">
-          <span>Delivery</span>
-          <span className="price">{mode === "pickup" ? "Free (pickup)" : deliveryFee ? aed(deliveryFee) : zone ? "Free" : "Choose area"}</span>
-        </div>
-        <div className="mt-2 flex justify-between border-t border-peach-mid/40 pt-3 text-[16px] font-semibold text-ink">
-          <span>Total</span>
-          <span className="price">{aed(total)}</span>
-        </div>
-      </div>
-
-      <h2 className="sec-head">Delivery details</h2>
+      <Step n={1} title="Delivery or pickup" />
       <div className="mb-3 grid grid-cols-2 gap-2.5">
         {(
           [
@@ -334,6 +320,7 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
         </p>
       )}
 
+      <Step n={2} title="Your details" />
       <Field label="Your name" error={errors.name}>
         <input
           className={`field ${errors.name ? "field-err" : ""}`}
@@ -359,9 +346,9 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
         />
       </Field>
 
-      <h2 className="sec-head">Pick a date &amp; time</h2>
+      <Step n={3} title="Date & time" />
       {cart.leadHours > 0 && (
-        <p className="mb-2 text-[11px] text-muted">Items in your basket need {cart.leadHours} hours&rsquo; notice, so the earliest date is shown first.</p>
+        <p className="mb-2.5 text-[12.5px] text-muted">Baked fresh, so orders need {cart.leadHours} hours&rsquo; notice.</p>
       )}
       {/* The right-edge fade signals that more dates scroll into view. */}
       <div className="relative mb-2">
@@ -398,33 +385,48 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
         </p>
       )}
 
+      <Step n={4} title="Anything else?" />
       <Field label="Special requests">
-        <textarea className="field min-h-[70px]" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={`Allergies, dedications, anything for ${settings.owner_name} to know…`} />
+        <textarea className="field min-h-[76px]" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={`Allergies, dedications, anything for ${settings.owner_name} to know\u2026`} />
       </Field>
-
-      <Toggle on={isGift} onChange={setIsGift} icon={<Gift size={22} aria-hidden />} title="This is a gift" sub="Add a handwritten card and we won't include prices" />
-      {isGift && (
-        <div className="mb-3 rounded-[12px] border border-line bg-surface p-3">
-          <Field label="Recipient's name">
-            <input className="field" value={giftRecipient} onChange={(e) => setGiftRecipient(e.target.value)} />
-          </Field>
-          <Field label="Card message">
-            <textarea className="field min-h-[60px]" maxLength={300} value={giftMessage} onChange={(e) => setGiftMessage(e.target.value)} placeholder="Happy birthday, with love…" />
-          </Field>
-        </div>
-      )}
-
-      <h2 className="sec-head">Payment</h2>
-      <div className="mb-3 grid gap-2">
-        {settings.accept_cash && <Radio checked={payment === "cash"} onChange={() => setPayment("cash")} title="Cash on delivery / pickup" sub="Pay when your order arrives" />}
-        {settings.accept_bank_transfer && (
-          <Radio checked={payment === "bank_transfer"} onChange={() => setPayment("bank_transfer")} title="Bank transfer" sub="Details shared after you order" />
+      <div className="card divide-y divide-line">
+        <Toggle on={isGift} onChange={setIsGift} icon={<Gift size={21} aria-hidden />} title="This is a gift" sub="A handwritten card, no prices inside" />
+        {isGift && (
+          <div className="px-4 pb-1 pt-4">
+            <Field label="Recipient's name">
+              <input className="field" value={giftRecipient} onChange={(e) => setGiftRecipient(e.target.value)} />
+            </Field>
+            <Field label="Card message">
+              <textarea className="field min-h-[60px]" maxLength={300} value={giftMessage} onChange={(e) => setGiftMessage(e.target.value)} placeholder="Happy birthday, with love…" />
+            </Field>
+          </div>
         )}
+        <Toggle on={waUpdates} onChange={setWaUpdates} icon={<ChatCircleDots size={21} aria-hidden />} title="Order updates on WhatsApp" sub="Confirmed, baking, on the way" />
+        <Toggle on={marketing} onChange={setMarketing} icon={<Sparkle size={21} aria-hidden />} title="Weekly specials" sub="One message on Thursdays" />
       </div>
 
-      <h2 className="sec-head">Notifications</h2>
-      <Toggle on={waUpdates} onChange={setWaUpdates} icon={<ChatCircleDots size={22} aria-hidden />} title="Send me order updates on WhatsApp" sub="Confirmed, baking, on the way" />
-      <Toggle on={marketing} onChange={setMarketing} icon={<Sparkle size={22} aria-hidden />} title="Tell me about weekly specials" sub="One message on Thursdays" />
+      <Step n={5} title="Payment" />
+      <div role="radiogroup" aria-label="Payment" className="card mb-8 divide-y divide-line">
+        {settings.accept_cash && <Radio checked={payment === "cash"} onChange={() => setPayment("cash")} title="Cash on delivery or pickup" sub="Pay when your order arrives" />}
+        {settings.accept_bank_transfer && <Radio checked={payment === "bank_transfer"} onChange={() => setPayment("bank_transfer")} title="Bank transfer" sub="Details come after you order" />}
+      </div>
+
+      <div className="mb-2 rounded-[16px] bg-peach p-5 text-[14px] text-peach-deep">
+        <div className="flex justify-between py-0.5">
+          <span>
+            Subtotal · {cart.count} {cart.count === 1 ? "item" : "items"}
+          </span>
+          <span className="price">{aed(cart.subtotal)}</span>
+        </div>
+        <div className="flex justify-between py-0.5">
+          <span>{mode === "pickup" ? "Pickup" : "Delivery"}</span>
+          <span className="price">{mode === "pickup" ? "Free" : deliveryFee ? aed(deliveryFee) : zone ? "Free" : "Choose your area"}</span>
+        </div>
+        <div className="mt-2 flex justify-between border-t border-peach-mid/40 pt-3 text-[17px] font-semibold text-ink">
+          <span>Total</span>
+          <span className="price">{aed(total)}</span>
+        </div>
+      </div>
 
       <div className="absolute -left-[9999px] top-0" aria-hidden="true">
         <label>
@@ -437,9 +439,12 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
           {errors.form}
         </p>
       )}
-      <button type="button" className="btn-p press mt-4 w-full py-4 text-[15px] font-semibold" onClick={submit} disabled={submitting || Boolean(belowMin)} aria-busy={submitting}>
-        <WhatsAppIcon /> {submitting ? "Saving your order…" : `Confirm & send to ${settings.owner_name} on WhatsApp`}
-      </button>
+      {/* Stays in reach above the tab bar while the form scrolls. */}
+      <div className="sticky bottom-[calc(72px+env(safe-area-inset-bottom))] z-20 -mx-4 bg-gradient-to-t from-cream via-cream to-transparent px-4 pb-3 pt-5 md:bottom-0 md:mx-0 md:px-0">
+        <button type="button" className="btn-p press w-full py-4 text-[15px] font-semibold shadow-[0_14px_30px_-14px_rgba(155,75,107,0.7)]" onClick={submit} disabled={submitting || Boolean(belowMin)} aria-busy={submitting}>
+          <WhatsAppIcon /> {submitting ? "Saving your order…" : `Send order to ${settings.owner_name} · ${aed(total)}`}
+        </button>
+      </div>
       <Toast message={toast} onDone={clearToast} />
     </>
   );
@@ -460,7 +465,7 @@ function Field({ label, error, children }: { label: string; error?: string; chil
 
 function Toggle({ on, onChange, icon, title, sub }: { on: boolean; onChange: (v: boolean) => void; icon: React.ReactNode; title: string; sub: string }) {
   return (
-    <div className="card mb-2.5 flex items-center gap-3.5 p-4">
+    <div className="flex items-center gap-3.5 px-4 py-3.5">
       <div className="text-rose-deep">{icon}</div>
       <div className="flex-1">
         <div className="text-[14px] font-semibold">{title}</div>
@@ -482,12 +487,22 @@ function Toggle({ on, onChange, icon, title, sub }: { on: boolean; onChange: (v:
 
 function Radio({ checked, onChange, title, sub }: { checked: boolean; onChange: () => void; title: string; sub: string }) {
   return (
-    <label className={`card flex cursor-pointer items-center gap-3.5 p-4 ${checked ? "border-rose-deep" : ""}`}>
-      <input type="radio" name="payment" checked={checked} onChange={onChange} className="accent-rose-deep" />
+    <label className={`flex cursor-pointer items-center gap-3.5 px-4 py-3.5 transition-colors ${checked ? "bg-rose/40" : ""}`}>
+      <input type="radio" name="payment" checked={checked} onChange={onChange} className="h-4 w-4 accent-rose-deep" />
       <div>
         <div className="text-[14px] font-semibold">{title}</div>
         <div className="text-[12.5px] text-muted">{sub}</div>
       </div>
     </label>
+  );
+}
+
+/** A numbered checkout step heading. */
+function Step({ n, title }: { n: number; title: string }) {
+  return (
+    <h2 className="mb-4 mt-10 flex items-center gap-3 text-[21px] leading-tight md:text-[23px]">
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-rose font-body text-[14px] font-semibold text-rose-deep">{n}</span>
+      {title}
+    </h2>
   );
 }
