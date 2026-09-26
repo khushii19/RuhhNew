@@ -64,7 +64,7 @@ function SpecialsSheet({ specials, settings, onClose }: { specials: Special[]; s
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">This week&rsquo;s special from {settings.business_name}</p>
                 <h3 className="mt-2 text-[24px] leading-tight">{s.name}</h3>
                 {s.description && <p className="mx-auto mt-1.5 max-w-[36ch] text-[14px] leading-relaxed text-muted">{s.description}</p>}
-                <p className={`mx-auto mt-3 inline-block rounded-full px-3 py-1 text-[11.5px] font-semibold ${a.bg} ${a.text}`}>Order before stock runs out</p>
+                <p className={`mx-auto mt-3 inline-block rounded-full px-3 py-1 text-[11.5px] font-semibold ${a.bg} ${a.text}`}>Available this week only</p>
                 <div className="mt-3 flex items-baseline justify-center gap-2">
                   <span className={`price text-[24px] font-semibold ${a.text}`}>{aed(s.price_aed)}</span>
                   {s.old_price_aed != null && <span className="price text-[14px] text-muted line-through">{aed(s.old_price_aed)}</span>}

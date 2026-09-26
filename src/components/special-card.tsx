@@ -51,12 +51,12 @@ export function SpecialCard({ special: s, leadTimeHours }: { special: Special; l
   }
 
   return (
-    <article className={`flex items-center gap-4 rounded-[20px] border-[1.5px] border-dashed bg-surface p-3 pr-4 ${a.border}`}>
-      <div className={`relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-[14px] text-[40px] md:h-28 md:w-28 ${a.bg}`}>
+    <article className="flex items-center gap-4 rounded-[16px] border border-line bg-surface p-3 pr-4">
+      <div className={`relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-[12px] text-[40px] md:h-28 md:w-28 ${a.bg}`}>
         {s.image_url ? <Photo src={s.image_url} alt={s.name} fill sizes="112px" className="object-cover" /> : <span aria-hidden>{s.emoji}</span>}
       </div>
       <div className="min-w-0 flex-1">
-        {s.tag && <span className={`tag mb-1.5 uppercase tracking-[0.08em] ${a.bg} ${a.text}`}>{s.tag}</span>}
+        {s.tag && <span className={`mb-1 block text-[11px] font-bold uppercase tracking-[0.12em] ${a.text}`}>{s.tag}</span>}
         <h3 className="text-[18px] leading-snug">{s.name}</h3>
         <div className="mt-2 flex items-center justify-between gap-2">
           <span className="flex items-baseline gap-2">
@@ -68,7 +68,7 @@ export function SpecialCard({ special: s, leadTimeHours }: { special: Special; l
             onClick={addIt}
             disabled={s.price_aed <= 0}
             aria-label={`Add ${s.name} to basket`}
-            className={`press whitespace-nowrap rounded-full px-4 py-2 text-[13px] font-semibold text-white transition hover:brightness-110 disabled:opacity-50 ${a.btn}`}
+            className="btn-o press min-h-10 whitespace-nowrap px-4 py-2 text-[13.5px]"
           >
             Add
           </button>

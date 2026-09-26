@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CartProvider } from "@/components/cart-context";
-import { BrandSeal, Wordmark } from "@/components/brand-logo";
+import { Wordmark } from "@/components/brand-logo";
 import { CartBar } from "@/components/cart-bar";
 import { CartPill, DesktopTabs, MobileTabBar } from "@/components/site-nav";
 import { InstagramIcon, WhatsAppIcon } from "@/components/icons";
@@ -15,11 +15,6 @@ export function SiteShell({ settings, children }: { settings: Settings; children
           <div className="mx-auto flex h-16 max-w-[1080px] items-center justify-between gap-4 px-4 md:px-6">
             <Link href="/" className="flex min-w-0 items-center gap-3" aria-label={`${settings.business_name} home`}>
               <Wordmark url={settings.logo_url} height={34} priority />
-              <span className="hidden border-l border-line pl-3 text-[11px] leading-tight tracking-[0.04em] text-muted sm:block">
-                Baked to perfection
-                <br />
-                est. 2019
-              </span>
             </Link>
             <CartPill />
           </div>
@@ -43,8 +38,8 @@ function SiteFooter({ settings }: { settings: Settings }) {
   return (
     <footer className="border-t border-line bg-cream2 pb-24 md:pb-0">
       <div className="mx-auto flex max-w-[680px] flex-col items-center gap-5 px-4 py-10 text-center">
-        <BrandSeal size={96} variant="primary" />
-        <p className="-mt-1 text-[13.5px] text-muted">Home baked with soul in Dubai</p>
+        <Wordmark height={40} />
+        <p className="-mt-2 text-[13.5px] text-muted">Handmade in Dubai since 2019</p>
         <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
           {settings.whatsapp_number && (
             <a

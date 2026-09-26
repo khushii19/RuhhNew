@@ -5,9 +5,8 @@ import { useCallback, useMemo, useState } from "react";
 import { useCart } from "@/components/cart-context";
 import { WhatsAppIcon } from "@/components/icons";
 import { Photo } from "@/components/photo";
-import { Basket, ChatCircleDots, Gift, Sparkle } from "@phosphor-icons/react";
+import { Basket, ChatCircleDots, Gift, Moped, Sparkle, Storefront } from "@phosphor-icons/react";
 import { Toast, type ToastMessage } from "@/components/toast";
-import { Confetti } from "@/components/confetti";
 import { availableDates } from "@/lib/availability";
 import { aed, fmtDate, isValidPhone } from "@/lib/format";
 import type { CartLine, DeliveryZone, Order, Settings } from "@/lib/types";
@@ -173,7 +172,6 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
     const o = placed.order;
     return (
       <div className="m-slide-up rounded-[16px] border-[1.5px] border-sage-mid bg-sage p-7 text-center">
-        <Confetti />
         <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-sage-deep text-white shadow-[0_12px_24px_-12px_rgba(61,107,61,0.8)]">
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <path d="M5 12l5 5L20 7" className="check-draw" />
@@ -211,7 +209,7 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
 
   if (!cart.lines.length) {
     return (
-      <div className="rounded-[16px] border-[1.5px] border-dashed border-rose-mid/60 bg-surface px-6 py-14 text-center">
+      <div className="rounded-[16px] border border-line bg-surface px-6 py-14 text-center">
         <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-rose text-rose-deep">
           <Basket size={30} aria-hidden />
         </span>
@@ -261,22 +259,20 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
       <div className="mb-3 grid grid-cols-2 gap-2.5">
         {(
           [
-            ["delivery", "🚗", "Delivery", "Across Dubai · fee by area"],
-            ["pickup", "🏡", "Pickup", `Free · from ${settings.owner_name}’s kitchen`],
+            ["delivery", Moped, "Delivery", "Across Dubai, fee by area"],
+            ["pickup", Storefront, "Pickup", "Free, from our kitchen"],
           ] as const
-        ).map(([m, icon, label, sub]) => (
+        ).map(([m, Icon, label, sub]) => (
           <button
             key={m}
             type="button"
             aria-pressed={mode === m}
             onClick={() => setMode(m)}
-            className={`flex flex-col items-center rounded-[14px] border-[1.5px] p-4 text-center transition ${mode === m ? "border-rose-deep bg-rose" : "border-line bg-surface hover:border-rose-mid"}`}
+            className={`flex flex-col items-start rounded-[12px] border p-4 text-left transition-colors ${mode === m ? "border-rose-deep bg-rose/40 ring-1 ring-rose-deep" : "border-ink/15 bg-surface hover:border-rose-deep"}`}
           >
-            <span className="text-[24px]" aria-hidden>
-              {icon}
-            </span>
-            <div className={`mt-1 text-[14px] font-semibold ${mode === m ? "text-rose-deep" : ""}`}>{label}</div>
-            <div className="text-[12px] text-muted">{sub}</div>
+            <Icon size={24} weight={mode === m ? "fill" : "regular"} className={mode === m ? "text-rose-deep" : "text-ink/60"} aria-hidden />
+            <div className="mt-2 text-[14.5px] font-semibold">{label}</div>
+            <div className="text-[12.5px] text-ink/60">{sub}</div>
           </button>
         ))}
       </div>

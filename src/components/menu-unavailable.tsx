@@ -15,7 +15,7 @@ export function MenuUnavailable({ ownerName, whatsappNumber }: { ownerName: stri
       <WhatsAppButton
         number={whatsappNumber}
         message={`Hi ${ownerName}! I'd like to place an order.`}
-        className="press mt-6 inline-flex items-center gap-2 rounded-full bg-[#15803d] px-6 py-3 text-[14.5px] font-semibold text-white transition hover:brightness-110"
+        className="btn-wa mt-6 w-auto px-6"
       >
         Message {ownerName}
       </WhatsAppButton>

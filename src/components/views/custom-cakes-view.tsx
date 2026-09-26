@@ -7,13 +7,9 @@ export function CustomCakesView({ settings }: { settings: Settings }) {
     <div className="mx-auto w-full max-w-[680px]">
       <PageHeader
         eyebrow="Made to order"
-        title={
-          <>
-            Custom cakes for <em className="font-normal italic text-rose-deep">your moments</em>
-          </>
-        }
+        title="Custom cakes"
       >
-        Tell {settings.owner_name} what you have in mind and get a quote on WhatsApp. At least 48 hours&rsquo; notice, please.
+        Tell {settings.owner_name} what you have in mind and get a quote on WhatsApp. Please allow at least 48 hours.
       </PageHeader>
       <EnquiryForm settings={settings} />
     </div>

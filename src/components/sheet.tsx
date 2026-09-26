@@ -96,19 +96,18 @@ export function Sheet({
         role="dialog"
         aria-modal="true"
         aria-labelledby={labelledBy}
-        className="m-sheet relative flex max-h-[92dvh] w-full max-w-[480px] flex-col overflow-hidden rounded-t-[22px] bg-surface shadow-[0_-20px_50px_-30px_rgba(155,75,107,0.6)] transition-transform duration-200 sm:rounded-[16px]"
+        className="m-sheet relative flex max-h-[92dvh] w-full max-w-[480px] flex-col overflow-hidden rounded-t-[20px] bg-surface shadow-[0_-20px_50px_-30px_rgba(155,75,107,0.6)] transition-transform duration-200 sm:rounded-[16px]"
       >
-        <div aria-hidden className="h-1.5 shrink-0 bg-gradient-to-r from-rose via-lav to-peach" />
         {/* Drag handle: phones only. */}
         <div
           aria-hidden
-          className="absolute inset-x-0 top-1.5 z-20 flex h-6 cursor-grab touch-none justify-center pt-2 sm:hidden"
+          className="absolute inset-x-0 top-0 z-20 flex h-7 cursor-grab touch-none justify-center pt-2.5 sm:hidden"
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
         >
-          <span className="h-1 w-10 rounded-full bg-ink/20" />
+          <span className="h-1 w-10 rounded-full bg-white/80 shadow-[0_0_6px_rgba(0,0,0,0.25)]" />
         </div>
         <button
           type="button"

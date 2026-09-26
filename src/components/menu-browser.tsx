@@ -47,7 +47,7 @@ export function MenuBrowser({ items, categories, settings }: { items: MenuItem[]
   return (
     <>
       {/* Search and category chips stay under the header while scrolling. */}
-      <div className="sticky top-16 z-30 -mx-4 mb-5 bg-cream/95 px-4 pb-3 pt-2 backdrop-blur md:top-[105px] md:-mx-6 md:px-6">
+      <div className="sticky top-16 z-30 -mx-4 mb-5 bg-cream/95 px-4 pb-3 pt-2 backdrop-blur md:top-[102px] md:-mx-6 md:px-6">
         <label className="relative block">
           <span className="sr-only">Search the menu</span>
           <MagnifyingGlass size={16} aria-hidden className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
@@ -79,7 +79,7 @@ export function MenuBrowser({ items, categories, settings }: { items: MenuItem[]
       </div>
 
       {list.length === 0 ? (
-        <div className="mx-auto max-w-[680px] rounded-[16px] border border-dashed border-rose-mid/50 bg-surface px-6 py-14 text-center">
+        <div className="mx-auto max-w-[680px] rounded-[16px] border border-line bg-surface px-6 py-14 text-center">
           <p className="text-[15px] text-ink">{q.trim() ? `No treats found for ‘${q.trim()}’.` : "No treats here yet."}</p>
           <button
             type="button"

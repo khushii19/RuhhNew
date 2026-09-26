@@ -10,7 +10,7 @@ export default function SiteError({ error, retry }: { error: Error & { digest?: 
   }, [error]);
 
   return (
-    <div className="mx-auto max-w-[680px] rounded-[16px] border-[1.5px] border-dashed border-rose-mid/60 bg-surface px-6 py-14 text-center">
+    <div className="mx-auto max-w-[680px] rounded-[16px] border border-line bg-surface px-6 py-14 text-center">
       <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-rose text-rose-deep">
         <Cookie size={30} aria-hidden />
       </span>

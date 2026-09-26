@@ -23,7 +23,7 @@ export function DesktopTabs() {
   const path = usePathname();
   return (
     <nav aria-label="Main" className="hidden md:block">
-      <ul className="mx-auto flex max-w-[1080px] items-center gap-1.5 px-6 pb-3">
+      <ul className="mx-auto flex max-w-[1080px] items-center gap-7 px-6">
         {DESKTOP_TABS.map((t) => {
           const active = isActive(path, t.href);
           return (
@@ -31,8 +31,8 @@ export function DesktopTabs() {
               <Link
                 href={t.href}
                 aria-current={active ? "page" : undefined}
-                className={`block rounded-full px-4 py-1.5 text-[13.5px] transition-colors ${
-                  active ? "bg-rose font-semibold text-rose-deep" : "text-muted hover:bg-cream2 hover:text-ink"
+                className={`-mb-px block border-b-2 pb-3 pt-1 text-[14px] transition-colors ${
+                  active ? "border-rose-deep font-semibold text-ink" : "border-transparent text-ink/60 hover:text-ink"
                 }`}
               >
                 {t.label}
@@ -51,7 +51,7 @@ export function CartPill() {
   return (
     <Link
       href="/order"
-      className="press flex shrink-0 items-center gap-2 rounded-full bg-rose py-2 pl-3.5 pr-2 text-[13px] font-semibold text-rose-deep transition hover:bg-rose-deep hover:text-white"
+      className="press flex shrink-0 items-center gap-2 rounded-[12px] border border-ink/15 py-2 pl-3 pr-2 text-[14px] font-semibold text-ink transition-colors hover:border-rose-deep hover:text-rose-deep"
       aria-label={`View basket, ${n} ${n === 1 ? "item" : "items"}`}
     >
       <Basket size={17} weight="bold" aria-hidden />
@@ -59,7 +59,7 @@ export function CartPill() {
       <span
         key={n}
         aria-live="polite"
-        className={`price flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-rose-deep px-1.5 text-[11px] font-bold text-white ${n > 0 ? "m-bump" : ""}`}
+        className={`price flex h-[22px] min-w-[22px] items-center justify-center rounded-full px-1.5 text-[11.5px] font-bold ${n > 0 ? "m-bump bg-rose-deep text-white" : "bg-cream2 text-muted"}`}
       >
         {n}
       </span>
@@ -95,11 +95,9 @@ export function MobileTabBar() {
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={`relative flex flex-col items-center gap-0.5 pb-2 pt-2.5 text-[10.5px] transition-colors ${active ? "text-rose-deep" : "text-muted"}`}
+                className={`relative flex flex-col items-center gap-1 pb-2 pt-2.5 text-[11px] transition-colors ${active ? "font-semibold text-rose-deep" : "text-ink/55"}`}
               >
-                <span className={`flex h-7 w-12 items-center justify-center rounded-full transition-colors ${active ? "bg-rose" : ""}`}>
-                  <Icon size={21} weight={active ? "fill" : "regular"} aria-hidden />
-                </span>
+                <Icon size={23} weight={active ? "fill" : "regular"} aria-hidden />
                 {label}
                 {href === "/order" && hydrated && count > 0 && (
                   <span

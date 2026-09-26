@@ -143,7 +143,7 @@ export function TrackOrder({ settings, items, categories }: { settings: Settings
         !loading &&
         !recent.length &&
         !params.get("ref") && (
-          <div className="mb-6 rounded-[16px] border-[1.5px] border-dashed border-rose-mid/60 bg-surface px-6 py-10 text-center">
+          <div className="mb-6 rounded-[16px] border border-line bg-surface px-6 py-10 text-center">
             <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-rose text-rose-deep">
               <Package size={28} aria-hidden />
             </span>
@@ -318,7 +318,7 @@ function CurrentOrder({ order: o, settings: st, onOrderAgain }: { order: Order; 
       )}
 
       <p className="mb-4 rounded-[10px] bg-peach p-3.5 text-[13px] leading-[1.6] text-peach-deep">
-        {done ? "Delivered — hope you enjoyed it! ❤️" : `${owner} has your order. You'll get a WhatsApp message with each update.`}
+        {done ? "Delivered. We hope you enjoyed it." : `${owner} has your order. You'll get a WhatsApp message with each update.`}
       </p>
 
       <WhatsAppButton number={st.whatsapp_number} message={`Hi ${owner}! Just checking on my order #${o.ref}.`}>
