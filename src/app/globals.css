@@ -22,71 +22,20 @@
   --color-rose-clay: #b8707c;
   --color-surface: #ffffff;
   --color-on-accent: #ffffff;
-  --font-body: var(--font-dm-sans), "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-body: var(--font-lora), Georgia, "Times New Roman", serif;
   --radius-card: 16px;
   --radius-sm: 10px;
 }
 
-html {
-  color-scheme: light dark;
+/* Light only: the brand is cream and pastels, whatever the device theme. */
+:root {
+  color-scheme: light;
 }
 /* Section pills and "Order now" jump within the page. */
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
   }
-}
-
-/* ---------- dark theme ----------
-   Tokens only: every utility reads these variables, so the whole app
-   flips. System preference by default; data-theme overrides it. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --color-cream: #1c1315;
-    --color-cream2: #261a1d;
-    --color-surface: #2d2024;
-    --color-ink: #f4ece7;
-    --color-muted: #c6a8b0;
-    --color-line: rgba(247, 214, 224, 0.14);
-    --color-rose: #45293a;
-    --color-rose-mid: #d4829e;
-    --color-rose-deep: #d98aa9;
-    --color-rose-clay: #d68e9c;
-    --color-lav: #372b4a;
-    --color-lav-mid: #a98bd0;
-    --color-lav-deep: #c9b3ea;
-    --color-sage: #263826;
-    --color-sage-mid: #8cbf8c;
-    --color-sage-deep: #a6d2a6;
-    --color-peach: #46331f;
-    --color-peach-mid: #e8a870;
-    --color-peach-deep: #f1c69a;
-    --color-danger: #f08a96;
-    --color-on-accent: #1c1315;
-  }
-}
-:root[data-theme="dark"] {
-  --color-cream: #1c1315;
-  --color-cream2: #261a1d;
-  --color-surface: #2d2024;
-  --color-ink: #f4ece7;
-  --color-muted: #c6a8b0;
-  --color-line: rgba(247, 214, 224, 0.14);
-  --color-rose: #45293a;
-  --color-rose-mid: #d4829e;
-  --color-rose-deep: #d98aa9;
-  --color-rose-clay: #d68e9c;
-  --color-lav: #372b4a;
-  --color-lav-mid: #a98bd0;
-  --color-lav-deep: #c9b3ea;
-  --color-sage: #263826;
-  --color-sage-mid: #8cbf8c;
-  --color-sage-deep: #a6d2a6;
-  --color-peach: #46331f;
-  --color-peach-mid: #e8a870;
-  --color-peach-deep: #f1c69a;
-  --color-danger: #f08a96;
-  --color-on-accent: #1c1315;
 }
 
 /* .bleed bands span the viewport from inside the centred main column; clip
@@ -119,7 +68,7 @@ body {
     @apply flex w-full items-center justify-center gap-2 rounded-full bg-[#15803d] px-5 py-3.5 text-[14.5px] font-semibold text-white transition hover:brightness-110 disabled:opacity-60;
   }
   .card {
-    @apply rounded-[14px] border border-line bg-surface;
+    @apply rounded-[16px] border border-line bg-surface;
   }
   .sec-head {
     @apply mb-4 mt-8 flex items-center gap-3 text-[22px] leading-tight text-ink first:mt-0 md:text-[24px];
@@ -141,7 +90,7 @@ body {
   .label {
     @apply mb-1.5 block text-[13px] font-medium text-ink/80;
   }
-  /* Prices: Playfair and DM Sans default to old-style figures, which make
+  /* Prices: Lora defaults to old-style figures, which make
      "AED 85" dip and wobble in columns. */
   .price {
     font-variant-numeric: lining-nums tabular-nums;
@@ -170,7 +119,7 @@ body {
 
 /* ---------- display type ---------- */
 @theme {
-  --font-display: var(--font-playfair), "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-display: var(--font-lora), Georgia, "Times New Roman", serif;
 }
 h1,
 h2,
@@ -290,6 +239,10 @@ h3,
 }
 .m-slide-up {
   animation: slide-up 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+/* Sheets rise in; backwards fill so a drag can set its own transform. */
+.m-sheet {
+  animation: slide-up 0.35s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 .m-pop {
   animation: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -428,79 +381,9 @@ h3,
   }
 }
 
-/* Banner parallax: the photo drifts down a little as the page scrolls up,
-   driven by scroll position where the browser supports it; elsewhere the
-   photo keeps its Ken Burns drift. */
-@supports (animation-timeline: scroll()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .hero-parallax {
-      animation: hero-drift linear both;
-      animation-timeline: scroll(root);
-      animation-range: 0 90vh;
-    }
-  }
-}
-/* Scaled so the 6% drift never uncovers the band behind the photo's top edge. */
-@keyframes hero-drift {
-  from {
-    transform: scale(1.14);
-  }
-  to {
-    transform: translateY(6%) scale(1.14);
-  }
-}
-
 /* Section pills: a soft shadow once the bar is stuck under the header. */
 .pills-stuck {
   box-shadow: 0 10px 24px -18px rgba(155, 75, 107, 0.55);
-}
-
-/* ---------- hero ---------- */
-@keyframes ken-burns {
-  from {
-    transform: scale(1.04) translate3d(0, 0, 0);
-  }
-  to {
-    transform: scale(1.14) translate3d(-1.5%, -1.5%, 0);
-  }
-}
-.hero-photo {
-  animation: ken-burns 22s ease-out both;
-  transform-origin: 55% 45%;
-  will-change: transform;
-}
-@keyframes word-in {
-  from {
-    opacity: 0;
-    transform: translateY(0.35em) rotate(1.5deg);
-    filter: blur(4px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-    filter: blur(0);
-  }
-}
-.words > span {
-  display: inline-block;
-  animation: word-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--w, 0) * 90ms + 120ms);
-}
-
-/* ---------- marquee ---------- */
-@keyframes marquee {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(-50%, 0, 0);
-  }
-}
-.marquee-track {
-  animation: marquee 38s linear infinite;
-}
-.marquee:hover .marquee-track {
-  animation-play-state: paused;
 }
 
 /* ---------- chips & nav ---------- */
@@ -514,18 +397,8 @@ h3,
 .chip-sel {
   transform: scale(1.04);
 }
-.nav-pill {
-  transition:
-    left 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-    width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-}
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-photo,
-  .marquee-track,
-  .words > span {
-    animation: none !important;
-  }
   .rg-hidden > * {
     opacity: 1;
     transform: none;
@@ -536,27 +409,10 @@ h3,
   }
 }
 
-/* ---------- theme-conditional assets (logo variants) ---------- */
-.only-dark {
-  display: none;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .only-light {
-    display: none;
-  }
-  :root:not([data-theme="light"]) .only-dark {
-    display: block;
-  }
-}
-:root[data-theme="dark"] .only-light {
-  display: none;
-}
-:root[data-theme="dark"] .only-dark {
-  display: block;
-}
-:root[data-theme="light"] .only-light {
-  display: block;
-}
-:root[data-theme="light"] .only-dark {
-  display: none;
+/* ---------- admin ----------
+   A plain system sans so the admin reads as a tool; same palette. */
+.admin-ui {
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: var(--font-body);
+  font-family: var(--font-body);
 }

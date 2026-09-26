@@ -6,6 +6,7 @@ import { aed } from "@/lib/format";
 import type { Category, MenuItem } from "@/lib/types";
 import { createMenuItem } from "@/app/admin/actions";
 import { AvailabilityToggle } from "@/components/admin/availability-toggle";
+import { MoveButtons } from "@/components/admin/move-buttons";
 
 export default async function AdminMenuPage() {
   const db = adminClient();
@@ -29,11 +30,12 @@ export default async function AdminMenuPage() {
         <section key={g.cat?.id ?? "none"} className="mb-5">
           <h2 className="sec-head">{g.cat?.name ?? "Uncategorised"}</h2>
           <div className="grid gap-2">
-            {g.items.map((m) => {
+            {g.items.map((m, idx) => {
               const prices = m.item_sizes.map((s) => Number(s.price_aed));
               const unpriced = prices.some((p) => p <= 0);
               return (
                 <div key={m.id} className={`card flex items-center gap-3 p-3 ${m.is_available ? "" : "opacity-60"}`}>
+                  <MoveButtons table="menu_items" id={m.id} name={m.name} first={idx === 0} last={idx === g.items.length - 1} />
                   <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-cream2 text-[22px]">
                     {m.image_url ? <Photo src={m.image_url} alt="" fill sizes="48px" className="object-cover" /> : m.emoji}
                   </div>
@@ -46,6 +48,7 @@ export default async function AdminMenuPage() {
                       {m.item_flavours.length ? ` · ${m.item_flavours.length} flavours${m.mixable ? " (mix)" : ""}` : ""}
                     </div>
                     {unpriced && <span className="tag mt-1 bg-peach text-peach-deep">price missing</span>}
+                    {m.is_sold_out && <span className="tag mt-1 ml-1 bg-cream2 text-muted">sold out</span>}
                   </div>
                   <AvailabilityToggle id={m.id} available={m.is_available} />
                   <Link href={`/admin/menu/${m.id}`} className="btn-o px-3 py-1 text-[12px]">

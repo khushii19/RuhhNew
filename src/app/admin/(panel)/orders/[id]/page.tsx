@@ -5,7 +5,7 @@ import { aed, fmtDate, fmtDateTime } from "@/lib/format";
 import { STATUS_LABELS, type Order } from "@/lib/types";
 import { PaymentBadge, StatusBadge } from "@/components/admin/status-badge";
 import { OrderControls } from "@/components/admin/order-controls";
-import { updateOrderAdjustment } from "@/app/admin/actions";
+import { saveOrderNote, updateOrderAdjustment } from "@/app/admin/actions";
 
 interface WaMsg {
   id: string;
@@ -82,6 +82,16 @@ export default async function OrderDetail({ params }: { params: Promise<{ id: st
           <div className="mt-2 text-[11px] text-muted">
             WhatsApp updates {o.whatsapp_updates ? "on" : "off"} · Marketing {o.marketing_opt_in ? "yes" : "no"} · Placed {fmtDateTime(o.created_at)}
           </div>
+          <form action={saveOrderNote} className="mt-3 border-t border-line pt-3">
+            <input type="hidden" name="id" value={o.id} />
+            <label className="block">
+              <span className="label">Private note (only you see this)</span>
+              <textarea name="admin_note" defaultValue={o.admin_note ?? ""} maxLength={2000} placeholder="e.g. Paid by transfer, extra candles" className="admin-input min-h-[60px]" />
+            </label>
+            <div className="mt-1.5 flex justify-end">
+              <button className="btn-o px-3 py-1 text-[12px]">Save note</button>
+            </div>
+          </form>
         </div>
 
         <div className="card p-4">

@@ -69,10 +69,12 @@ export interface MenuItem {
   description: string;
   emoji: string;
   image_url: string | null;
-  /** Free-text allergen note (migration 0004); absent on older databases. */
+  /** Free-text allergen note (migration 0004); kept in the database, not shown. */
   allergens?: string | null;
   mixable: boolean;
   is_available: boolean;
+  /** Listed but can't be ordered (migration 0005); absent on older databases. */
+  is_sold_out?: boolean;
   is_featured: boolean;
   sort_order: number;
   item_sizes: ItemSize[];
@@ -90,6 +92,9 @@ export interface Special {
   accent: Accent;
   image_url: string | null;
   is_active: boolean;
+  /** Optional show-from / show-until dates, inclusive (migration 0005). */
+  starts_on?: string | null;
+  ends_on?: string | null;
   sort_order: number;
 }
 
@@ -151,6 +156,8 @@ export interface Order {
   total: number;
   whatsapp_updates: boolean;
   marketing_opt_in: boolean;
+  /** Private note for the baker (migration 0005). */
+  admin_note?: string | null;
   created_at: string;
   updated_at: string;
   order_items?: OrderItem[];

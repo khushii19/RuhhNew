@@ -9,55 +9,60 @@ function isActive(path: string, href: string) {
   return href === "/" ? path === "/" : path.startsWith(href);
 }
 
-/** Desktop links. Home is the logo, and the order page is the cart button. */
-const DESKTOP_LINKS = [
+const DESKTOP_TABS = [
+  { href: "/", label: "Home" },
   { href: "/menu", label: "Menu" },
+  { href: "/order", label: "Order" },
+  { href: "/track", label: "Track" },
   { href: "/custom-cakes", label: "Custom cakes" },
   { href: "/reviews", label: "Reviews" },
-  { href: "/track", label: "Track order" },
 ];
 
-export function DesktopNav() {
+/** The first build's tab row under the header; phones use the bottom bar. */
+export function DesktopTabs() {
   const path = usePathname();
   return (
-    <nav aria-label="Main" className="hidden items-center gap-6 md:flex lg:gap-8">
-      {DESKTOP_LINKS.map((l) => {
-        const active = isActive(path, l.href);
-        return (
-          <Link
-            key={l.href}
-            href={l.href}
-            aria-current={active ? "page" : undefined}
-            className={`relative py-1 text-[13.5px] tracking-[0.02em] transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:bg-rose-deep after:transition-transform ${
-              active ? "text-rose-deep after:scale-x-100" : "text-ink/75 after:scale-x-0 hover:text-rose-deep hover:after:scale-x-100"
-            }`}
-          >
-            {l.label}
-          </Link>
-        );
-      })}
+    <nav aria-label="Main" className="hidden md:block">
+      <ul className="mx-auto flex max-w-[1080px] items-center gap-1.5 px-6 pb-3">
+        {DESKTOP_TABS.map((t) => {
+          const active = isActive(path, t.href);
+          return (
+            <li key={t.href}>
+              <Link
+                href={t.href}
+                aria-current={active ? "page" : undefined}
+                className={`block rounded-full px-4 py-1.5 text-[13.5px] transition-colors ${
+                  active ? "bg-rose font-semibold text-rose-deep" : "text-muted hover:bg-cream2 hover:text-ink"
+                }`}
+              >
+                {t.label}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
     </nav>
   );
 }
 
 export function CartPill() {
   const { count, hydrated } = useCart();
+  const n = hydrated ? count : 0;
   return (
     <Link
       href="/order"
-      className={`press flex shrink-0 items-center gap-2 rounded-full border border-ink/15 py-1.5 pl-3.5 text-[13px] ${hydrated && count > 0 ? "pr-1.5" : "pr-4"} text-ink transition hover:border-rose-deep hover:text-rose-deep`}
-      aria-label={`View basket, ${hydrated ? count : 0} ${hydrated && count === 1 ? "item" : "items"}`}
+      className="press flex shrink-0 items-center gap-2 rounded-full bg-rose py-2 pl-3.5 pr-2 text-[13px] font-semibold text-rose-deep transition hover:bg-rose-deep hover:text-white"
+      aria-label={`View basket, ${n} ${n === 1 ? "item" : "items"}`}
     >
-      <Basket size={17} aria-hidden />
+      <Basket size={17} weight="bold" aria-hidden />
       Basket
-      {hydrated && count > 0 && (
-        <span
-          key={count}
-          className="price m-bump flex h-[24px] min-w-[24px] items-center justify-center rounded-full bg-rose-deep px-1.5 text-[11px] font-bold text-on-accent"
-        >
-          {count}
-        </span>
-      )}
+      <span
+        key={n}
+        aria-live="polite"
+        className={`price flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-rose-deep px-1.5 text-[11px] font-bold text-white ${n > 0 ? "m-bump" : ""}`}
+      >
+        {n}
+      </span>
     </Link>
   );
 }
@@ -65,9 +70,9 @@ export function CartPill() {
 const TABS = [
   { href: "/", label: "Home", Icon: House },
   { href: "/menu", label: "Menu", Icon: Cookie },
-  { href: "/order", label: "Basket", Icon: Basket },
+  { href: "/order", label: "Order", Icon: Basket },
   { href: "/track", label: "Track", Icon: Truck },
-  { href: "/custom-cakes", label: "Custom", Icon: Cake },
+  { href: "/custom-cakes", label: "Cakes", Icon: Cake },
 ];
 
 /**
@@ -92,12 +97,14 @@ export function MobileTabBar() {
                 aria-current={active ? "page" : undefined}
                 className={`relative flex flex-col items-center gap-0.5 pb-2 pt-2.5 text-[10.5px] transition-colors ${active ? "text-rose-deep" : "text-muted"}`}
               >
-                <Icon size={22} weight={active ? "fill" : "regular"} aria-hidden />
+                <span className={`flex h-7 w-12 items-center justify-center rounded-full transition-colors ${active ? "bg-rose" : ""}`}>
+                  <Icon size={21} weight={active ? "fill" : "regular"} aria-hidden />
+                </span>
                 {label}
                 {href === "/order" && hydrated && count > 0 && (
                   <span
                     key={count}
-                    className="m-pop absolute left-1/2 top-1 ml-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-deep px-1 text-[9px] font-bold text-on-accent"
+                    className="m-pop absolute left-1/2 top-1 ml-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-deep px-1 text-[9px] font-bold text-white"
                   >
                     {count}
                   </span>

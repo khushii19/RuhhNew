@@ -5,7 +5,7 @@ import type { Order } from "@/lib/types";
 
 const order: Order = {
   id: "o1",
-  ref: "RUH-1042",
+  ref: "RUH-260908-004",
   status: "pending",
   mode: "delivery",
   customer_name: "Aisha Khan",
@@ -39,20 +39,23 @@ const order: Order = {
 
 describe("order helpers", () => {
   it("labels lines with flavour and size", () => {
-    expect(lineLabel(order.order_items![0])).toBe("Build Your Own Cookie Box (4× Dark Chocolate Chip, 2× Milk Chocolate Chip, Box of 6)");
+    expect(lineLabel(order.order_items![0])).toBe("Build Your Own Cookie Box (Box of 6 — 4× Dark Chocolate Chip, 2× Milk Chocolate Chip)");
     expect(lineLabel({ item_name: "Tiramisu", size_label: "", flavour_text: "" })).toBe("Tiramisu");
   });
 
   it("builds the WhatsApp hand-off message with all order details", () => {
     const msg = buildCustomerWhatsAppMessage(order, normalizeSettings({ business_name: "Ruhh" }));
-    expect(msg).toContain("Order RUH-1042");
-    expect(msg).toContain("Delivery to: Villa 12, Street 4");
-    expect(msg).toContain("Area: Jumeirah");
+    expect(msg.startsWith("*New order for Ruhh!*\nOrder #RUH-260908-004\n\nName: Aisha Khan\nWhatsApp: 050 123 4567\n")).toBe(true);
+    expect(msg).toContain("Delivery to: Villa 12, Street 4, Jumeirah\n");
+    expect(msg).toContain("Date: Tue 8 Sep · 4 PM – 6 PM\n");
+    expect(msg).toContain("• 🍪 Build Your Own Cookie Box (Box of 6 — 4× Dark Chocolate Chip, 2× Milk Chocolate Chip) x1 = AED 60");
+    expect(msg).toContain("Subtotal: AED 145\nDelivery: AED 15\n*Total: AED 160*");
     expect(msg).toContain("☕ Classic Tiramisu (500g) x1 = AED 85");
     expect(msg).toContain("*Total: AED 160*");
     expect(msg).toContain("Payment: Bank transfer");
     expect(msg).toContain("🎁 Gift for: Mum");
     expect(msg).toContain("Special requests: No nuts please");
+    expect(msg.endsWith("Please confirm. Thank you!")).toBe(true);
   });
 
   it("rejects malformed order input", () => {

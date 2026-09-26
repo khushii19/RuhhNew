@@ -8,7 +8,7 @@ import type { Review, Settings } from "@/lib/types";
 export function ReviewsView({ reviews, settings }: { reviews: Review[]; settings: Settings }) {
   const avg = reviews.length ? reviews.reduce((a, r) => a + r.rating, 0) / reviews.length : 0;
   return (
-    <div className="mx-auto w-full max-w-2xl">
+    <div className="mx-auto w-full max-w-[680px]">
       <PageHeader eyebrow="Kind words" title="Reviews" />
       {reviews.length > 0 && (
         <div className="mb-8 flex items-center gap-5 border-y border-line py-6">

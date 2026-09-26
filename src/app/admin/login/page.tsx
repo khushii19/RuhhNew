@@ -10,7 +10,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   if (session) redirect("/admin");
   const sp = await searchParams;
   return (
-    <div className="flex min-h-screen items-center justify-center bg-cream p-5">
+    <div className="admin-ui flex min-h-screen items-center justify-center bg-cream p-5">
       <div className="card w-full max-w-[380px] p-7">
         <div className="mb-5 flex items-center gap-3">
           <Monogram size={44} />

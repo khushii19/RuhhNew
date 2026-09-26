@@ -7,7 +7,7 @@ Expect about an hour end to end.
 
 - [ ] Sign in at https://supabase.com and create a project. Name: `ruhh`. Region: Mumbai or Frankfurt. Save the database password somewhere safe.
 - [ ] Open **SQL Editor → New query**. Paste the contents of `supabase/migrations/0001_init.sql`, run it. You should see "Success. No rows returned".
-- [ ] Repeat for `supabase/migrations/0002_photos_featured.sql`, then `supabase/migrations/0003_operations.sql`, then `supabase/migrations/0004_allergens.sql`.
+- [ ] Repeat for `supabase/migrations/0002_photos_featured.sql`, then `supabase/migrations/0003_operations.sql`, then `supabase/migrations/0004_allergens.sql`, then `supabase/migrations/0005_master_prompt.sql`.
 - [ ] Open `supabase/seed.sql`. On the last lines, replace `shweta@example.com` with Shweta's real email. Paste and run. You should see rows returned for the `seed_item` calls.
 - [ ] **Authentication → URL Configuration**: set *Site URL* to your Vercel URL (you will have it after step 2; come back and fill it in), and add `https://<your-vercel-url>/auth/callback` to *Redirect URLs*.
 - [ ] **Authentication → Providers → Email**: confirm Email is enabled. Leave "Confirm email" on.

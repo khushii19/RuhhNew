@@ -1,26 +1,25 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Photo } from "@/components/photo";
-import { useCallback, useState } from "react";
-import { Toast } from "@/components/toast";
 import { useCart } from "@/components/cart-context";
 import { aed } from "@/lib/format";
-import type { Special } from "@/lib/types";
+import type { Accent, Special } from "@/lib/types";
 
-/** Each special carries a pastel accent chosen in admin. */
-const ACCENT: Record<string, { bg: string; text: string }> = {
-  rose: { bg: "bg-rose", text: "text-rose-deep" },
-  lav: { bg: "bg-lav", text: "text-lav-deep" },
-  sage: { bg: "bg-sage", text: "text-sage-deep" },
-  peach: { bg: "bg-peach", text: "text-peach-deep" },
+/** Each special carries a pastel accent chosen in admin (full class names for Tailwind). */
+export const ACCENT: Record<Accent, { border: string; bg: string; text: string; btn: string }> = {
+  rose: { border: "border-rose-mid", bg: "bg-rose", text: "text-rose-deep", btn: "bg-rose-deep" },
+  lav: { border: "border-lav-mid", bg: "bg-lav", text: "text-lav-deep", btn: "bg-lav-deep" },
+  sage: { border: "border-sage-mid", bg: "bg-sage", text: "text-sage-deep", btn: "bg-sage-deep" },
+  peach: { border: "border-peach-mid", bg: "bg-peach", text: "text-peach-deep", btn: "bg-peach-deep" },
 };
 
-export function SpecialCard({ special: s, leadTimeHours }: { special: Special; leadTimeHours: number }) {
+/** Adds a special to the basket and goes to the order page. */
+export function useOrderSpecial(leadTimeHours: number) {
   const { add } = useCart();
-  const [toast, setToast] = useState<string | null>(null);
-  const clearToast = useCallback(() => setToast(null), []);
-
-  function order() {
+  const router = useRouter();
+  return (s: Special) => {
+    if (s.price_aed <= 0) return;
     add({
       kind: "special",
       specialId: s.id,
@@ -32,47 +31,39 @@ export function SpecialCard({ special: s, leadTimeHours }: { special: Special; l
       unitPrice: s.price_aed,
       leadTimeHours,
     });
-    // Stay on the page, like adding from the menu; the basket count and
-    // toast confirm it.
-    setToast(`${s.name} added`);
-  }
+    router.push("/order");
+  };
+}
 
+/** The first build's special card: dashed accent border, pastel image tile, one action. */
+export function SpecialCard({ special: s, leadTimeHours }: { special: Special; leadTimeHours: number }) {
+  const order = useOrderSpecial(leadTimeHours);
   const a = ACCENT[s.accent] ?? ACCENT.rose;
-  // A compact strip: square photo, name, price and one action.
   return (
-    <article className={`group grid h-full grid-cols-[112px_1fr] overflow-hidden rounded-[14px] sm:grid-cols-[150px_1fr] ${a.bg}`}>
-      <div className="relative flex min-h-[124px] items-center justify-center overflow-hidden text-[40px]">
-        {s.image_url ? (
-          <Photo
-            src={s.image_url}
-            alt={s.name}
-            fill
-            sizes="150px"
-            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
-          />
-        ) : (
-          s.emoji
-        )}
+    <article className={`flex gap-3.5 rounded-[16px] border-[1.5px] border-dashed bg-surface p-3.5 ${a.border}`}>
+      <div className={`relative flex h-[92px] w-[92px] shrink-0 items-center justify-center overflow-hidden rounded-[12px] text-[40px] ${a.bg}`}>
+        {s.image_url ? <Photo src={s.image_url} alt={s.name} fill sizes="92px" className="object-cover" /> : <span aria-hidden>{s.emoji}</span>}
       </div>
-      <div className="flex min-w-0 flex-col justify-center gap-1 p-4 sm:p-5">
-        {s.tag && <span className={`text-[10.5px] font-semibold uppercase tracking-[0.2em] ${a.text}`}>{s.tag}</span>}
-        <h3 className="truncate text-[19px] leading-tight sm:text-[21px]">{s.name}</h3>
-        <div className="mt-2 flex items-center justify-between gap-3">
-          <span className="flex items-baseline gap-2 whitespace-nowrap">
-            <span className="price text-[15px] font-semibold text-ink">{aed(s.price_aed)}</span>
-            {s.old_price_aed != null && <span className="price text-[12.5px] text-muted line-through">{aed(s.old_price_aed)}</span>}
-          </span>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <h3 className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[17px] leading-snug">
+          {s.name}
+          {s.tag && <span className={`tag font-body uppercase tracking-[0.08em] ${a.bg} ${a.text}`}>{s.tag}</span>}
+        </h3>
+        {s.description && <p className="mt-1 line-clamp-2 text-[12.5px] leading-relaxed text-muted">{s.description}</p>}
+        <div className="mt-auto flex items-center gap-2 pt-2">
+          <span className={`price text-[15px] font-semibold ${a.text}`}>{aed(s.price_aed)}</span>
+          {s.old_price_aed != null && <span className="price text-[12.5px] text-muted line-through">{aed(s.old_price_aed)}</span>}
           <button
-            onClick={order}
-            aria-label={`Add ${s.name} to basket`}
-            className="btn-p press whitespace-nowrap px-4 py-2 text-[12.5px] font-semibold"
+            type="button"
+            onClick={() => order(s)}
             disabled={s.price_aed <= 0}
+            aria-label={`Order ${s.name} now`}
+            className={`press ml-auto whitespace-nowrap rounded-full px-4 py-2 text-[12.5px] font-semibold text-white transition hover:brightness-110 disabled:opacity-50 ${a.btn}`}
           >
-            Add
+            Order now
           </button>
         </div>
       </div>
-      <Toast message={toast} onDone={clearToast} />
     </article>
   );
 }

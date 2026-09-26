@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await requireAdmin();
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="admin-ui min-h-screen bg-cream">
       <header className="sticky top-0 z-40 flex items-center justify-between gap-3 border-b-[1.5px] border-line bg-surface px-4 py-2.5">
         <Link href="/admin" className="flex items-center gap-2.5">
           <Monogram size={40} />

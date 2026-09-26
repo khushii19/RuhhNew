@@ -4,8 +4,8 @@ import type { DeliveryZone, Settings } from "@/lib/types";
 
 export function OrderView({ settings, zones }: { settings: Settings; zones: DeliveryZone[] }) {
   return (
-    <div className="mx-auto w-full max-w-2xl">
-      <PageHeader eyebrow="Checkout" title="Basket" />
+    <div className="mx-auto w-full max-w-[680px]">
+      <PageHeader eyebrow="Your order" title="Basket" />
       <Checkout settings={settings} zones={zones} />
     </div>
   );

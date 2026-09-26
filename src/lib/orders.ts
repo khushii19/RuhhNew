@@ -1,7 +1,11 @@
 import { z } from "zod";
 import { adminClient } from "@/lib/supabase/admin";
 import { normalizeSettings, ITEM_SELECT } from "@/lib/data";
-import { isDateAllowed } from "@/lib/availability";
+import { isDateAllowed, todayISO } from "@/lib/availability";
+import { isSpecialLive } from "@/lib/specials";
+import { lineLabel, shortDate } from "@/lib/orders-format";
+
+export { lineLabel, shortDate };
 import { isValidPhone, normalizePhone } from "@/lib/format";
 import type { Category, DeliveryZone, MenuItem, Order, OrderItem, Settings, Special } from "@/lib/types";
 
@@ -85,7 +89,7 @@ export async function priceLines(
   for (const l of lines) {
     if (l.kind === "special") {
       const s = l.specialId ? specialMap.get(l.specialId) : undefined;
-      if (!s || !s.is_active) throw new OrderError("A special in your cart is no longer available.");
+      if (!s || !isSpecialLive(s, todayISO())) throw new OrderError("A special in your cart is no longer available.");
       const unit = Number(s.price_aed);
       priced.push({
         item_id: null,
@@ -105,6 +109,7 @@ export async function priceLines(
 
     const m = l.itemId ? itemMap.get(l.itemId) : undefined;
     if (!m || !m.is_available) throw new OrderError("An item in your cart is no longer available.");
+    if (m.is_sold_out) throw new OrderError(`${m.name} is sold out for now.`);
     const size = m.item_sizes.find((s) => s.id === l.sizeId) ?? (m.item_sizes.length === 1 ? m.item_sizes[0] : undefined);
     if (!size) throw new OrderError(`Please choose a size for ${m.name}.`);
     const unit = Number(size.price_aed);
@@ -262,20 +267,16 @@ export async function createOrder(input: OrderInput): Promise<Order> {
   return { ...(order as Order), order_items: (savedItems ?? []) as OrderItem[] };
 }
 
-export function lineLabel(i: Pick<OrderItem, "item_name" | "size_label" | "flavour_text">) {
-  const extra = [i.flavour_text, i.size_label].filter(Boolean).join(", ");
-  return extra ? `${i.item_name} (${extra})` : i.item_name;
-}
-
 /** WhatsApp text the customer sends to the bakery after placing an order. */
 export function buildCustomerWhatsAppMessage(o: Order, settings: Settings) {
   const items = (o.order_items ?? [])
     .map((i) => `• ${i.emoji} ${lineLabel(i)} x${i.qty} = AED ${Number(i.line_total)}`)
     .join("\n");
-  const when = `${new Date(o.slot_date + "T00:00:00").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}, ${o.slot_label}`;
-  let msg = `*New order for ${settings.business_name}!*\nOrder ${o.ref}\n\nName: ${o.customer_name}\nWhatsApp: ${o.phone}\n`;
-  msg += o.mode === "delivery" ? `Delivery to: ${o.address}\nArea: ${o.zone_name}\n` : `Pickup\n`;
-  msg += `When: ${when}\n\n*Items:*\n${items}\n\nSubtotal: AED ${Number(o.subtotal)}\nDelivery: ${Number(o.delivery_fee) ? "AED " + Number(o.delivery_fee) : "Free"}\n*Total: AED ${Number(o.total)}*\nPayment: ${o.payment_method === "cash" ? "Cash" : "Bank transfer"}\n`;
+  let msg = `*New order for ${settings.business_name}!*\nOrder #${o.ref}\n\nName: ${o.customer_name}\nWhatsApp: ${o.phone}\n`;
+  msg += o.mode === "delivery" ? `Delivery to: ${o.address}${o.zone_name ? `, ${o.zone_name}` : ""}\n` : `Pickup\n`;
+  msg += `Date: ${shortDate(o.slot_date)} · ${o.slot_label}\n\n*Items:*\n${items}\n\n`;
+  msg += `Subtotal: AED ${Number(o.subtotal)}\nDelivery: ${Number(o.delivery_fee) ? "AED " + Number(o.delivery_fee) : "Free"}\n*Total: AED ${Number(o.total)}*\n`;
+  msg += `Payment: ${o.payment_method === "cash" ? "Cash" : "Bank transfer"}\n`;
   if (settings.tax_note) msg += `${settings.tax_note}\n`;
   if (o.is_gift) msg += `\n🎁 Gift for: ${o.gift_recipient || "-"}\nCard message: ${o.gift_message || "-"}\n`;
   if (o.notes) msg += `\nSpecial requests: ${o.notes}\n`;

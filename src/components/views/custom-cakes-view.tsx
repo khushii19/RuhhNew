@@ -4,7 +4,7 @@ import type { Settings } from "@/lib/types";
 
 export function CustomCakesView({ settings }: { settings: Settings }) {
   return (
-    <div className="mx-auto w-full max-w-2xl">
+    <div className="mx-auto w-full max-w-[680px]">
       <PageHeader
         eyebrow="Made to order"
         title={
@@ -13,8 +13,7 @@ export function CustomCakesView({ settings }: { settings: Settings }) {
           </>
         }
       >
-        Birthdays, anniversaries, baby showers, office parties. Tell {settings.owner_name} what you have in mind and you&rsquo;ll get a quote on
-        WhatsApp. Custom cakes need at least 48 hours&rsquo; notice.
+        Tell {settings.owner_name} what you have in mind and get a quote on WhatsApp. At least 48 hours&rsquo; notice, please.
       </PageHeader>
       <EnquiryForm settings={settings} />
     </div>

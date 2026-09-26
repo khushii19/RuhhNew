@@ -46,10 +46,6 @@ export default async function EditItemPage({ params, searchParams }: { params: P
             <label className="label">Short description</label>
             <input name="description" defaultValue={m.description} className="admin-input" />
           </div>
-          <div className="mt-3">
-            <label className="label">Allergens (shown to customers)</label>
-            <input name="allergens" defaultValue={m.allergens ?? ""} placeholder="e.g. Nuts, gluten, dairy, eggs" className="admin-input" />
-          </div>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             <div>
               <label className="label">Category</label>
@@ -88,6 +84,9 @@ export default async function EditItemPage({ params, searchParams }: { params: P
             </label>
             <label className="flex items-center gap-2">
               <input type="checkbox" name="is_featured" defaultChecked={m.is_featured} className="accent-rose-deep" /> Feature on home page
+            </label>
+            <label className="flex items-center gap-2">
+              <input type="checkbox" name="is_sold_out" defaultChecked={Boolean(m.is_sold_out)} className="accent-rose-deep" /> Sold out (listed, can&rsquo;t be ordered)
             </label>
           </div>
 

@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { CartProvider } from "@/components/cart-context";
-import { BrandLogo, Signature } from "@/components/brand-logo";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { CartPill, DesktopNav, MobileTabBar } from "@/components/site-nav";
+import { BrandBadge } from "@/components/brand-logo";
+import { CartBar } from "@/components/cart-bar";
+import { CartPill, DesktopTabs, MobileTabBar } from "@/components/site-nav";
 import { InstagramIcon, WhatsAppIcon } from "@/components/icons";
 import { waLink } from "@/lib/format";
 import type { Settings } from "@/lib/types";
@@ -11,35 +11,25 @@ export function SiteShell({ settings, children }: { settings: Settings; children
   return (
     <CartProvider>
       <div className="flex min-h-[100dvh] flex-col">
-        {/* Fixed colours, not theme tokens: a light strip over the dark theme
-            reads as a glitch. Hidden on phones, where the tab bar and header
-            already take enough of the screen. */}
-        <p className="hidden bg-[#2c1a1a] px-5 py-2 text-center text-[11.5px] tracking-[0.06em] text-[#fbf7f2]/85 md:block">
-          Handmade to order in Dubai
-          <span className="mx-2 text-[#fbf7f2]/40" aria-hidden>
-            ·
-          </span>
-          Order {settings.default_lead_time_hours} hours ahead
-        </p>
-        <header className="sticky top-0 z-40 border-b border-line bg-cream/92 backdrop-blur-md">
-          {/* Nav, centred logo, cart: the boutique arrangement on desktop.
-              Phones keep logo and cart; sections live in the tab bar. */}
-          <div className="mx-auto grid h-14 max-w-6xl grid-cols-[1fr_auto] items-center px-5 md:h-[84px] md:grid-cols-[1fr_auto_1fr] md:px-8">
-            <DesktopNav />
-            <Link href="/" className="flex items-center md:justify-self-center" aria-label={`${settings.business_name} home`}>
-              <BrandLogo url={settings.logo_url} height={38} variant="wordmark" />
+        <header className="sticky top-0 z-40 border-b border-line bg-surface/95 backdrop-blur-md">
+          <div className="mx-auto flex h-16 max-w-[1080px] items-center justify-between gap-4 px-4 md:px-6">
+            <Link href="/" className="flex min-w-0 items-center gap-3" aria-label={`${settings.business_name} home`}>
+              <BrandBadge url={settings.logo_url} size={40} />
+              <span className="min-w-0">
+                <span className="block font-display text-[21px] leading-none text-ink">{settings.business_name}</span>
+                <span className="mt-1 block truncate text-[11px] tracking-[0.04em] text-muted">Baked to perfection · est. 2019</span>
+              </span>
             </Link>
-            <div className="justify-self-end">
-              <CartPill />
-            </div>
+            <CartPill />
           </div>
+          <DesktopTabs />
         </header>
 
-        {/* Pages own their width: the home and menu use the full container,
-            forms and prose pages centre a narrower column. */}
-        <main className="mx-auto w-full max-w-6xl flex-1 px-5 pb-16 pt-6 md:px-8 md:pb-24 md:pt-10">{children}</main>
+        {/* Each page sets its own column: 680px for most, 1080px for the menu. */}
+        <main className="mx-auto w-full max-w-[1080px] flex-1 px-4 pb-32 pt-5 md:px-6 md:pb-20 md:pt-8">{children}</main>
 
         <SiteFooter settings={settings} />
+        <CartBar />
         <MobileTabBar />
       </div>
     </CartProvider>
@@ -48,76 +38,42 @@ export function SiteShell({ settings, children }: { settings: Settings; children
 
 function SiteFooter({ settings }: { settings: Settings }) {
   const ig = settings.instagram_handle?.replace(/^@/, "");
-  const linkCls = "text-[13.5px] text-ink/75 transition-colors hover:text-rose-deep";
+  const linkCls = "text-[13px] text-ink/75 transition-colors hover:text-rose-deep";
   return (
     <footer className="border-t border-line bg-cream2 pb-24 md:pb-0">
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-12 md:grid-cols-[1.5fr_1fr_1fr_1.3fr] md:px-8 md:py-16">
-        <div className="flex items-start gap-4 md:flex-col">
-          <Signature size={76} />
-          <p className="max-w-[28ch] text-[13.5px] leading-relaxed text-muted">
-            Small-batch bakes, made to order by {settings.owner_name} in Dubai.
-          </p>
+      <div className="mx-auto flex max-w-[680px] flex-col items-center gap-5 px-4 py-10 text-center">
+        <div className="flex items-center gap-3">
+          <BrandBadge url={settings.logo_url} size={34} />
+          <p className="text-[13.5px] text-muted">Home baked with soul in Dubai</p>
         </div>
-
-        <FooterCol title="Shop">
-          <Link href="/menu" className={linkCls}>Menu</Link>
-          <Link href="/custom-cakes" className={linkCls}>Custom cakes</Link>
-          <Link href="/order" className={linkCls}>Your basket</Link>
-        </FooterCol>
-
-        <FooterCol title="Help">
-          <Link href="/track" className={linkCls}>Track an order</Link>
-          <Link href="/reviews" className={linkCls}>Reviews</Link>
-          <Link href="/terms" className={linkCls}>Ordering terms</Link>
-          <Link href="/privacy" className={linkCls}>Privacy</Link>
-        </FooterCol>
-
-        <FooterCol title="Say hello">
+        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
           {settings.whatsapp_number && (
             <a
               href={waLink(settings.whatsapp_number, `Hi ${settings.owner_name}!`)}
               target="_blank"
               rel="noopener noreferrer"
-              className={`${linkCls} inline-flex items-center gap-2`}
+              className={`${linkCls} inline-flex items-center gap-1.5`}
             >
               <WhatsAppIcon /> WhatsApp
             </a>
           )}
           {ig && (
-            <a href={`https://instagram.com/${ig}`} target="_blank" rel="noopener noreferrer" className={`${linkCls} inline-flex items-center gap-2`}>
+            <a href={`https://instagram.com/${ig}`} target="_blank" rel="noopener noreferrer" className={`${linkCls} inline-flex items-center gap-1.5`}>
               <InstagramIcon /> @{ig}
             </a>
           )}
-          {settings.pickup_address && <p className="text-[13.5px] text-muted">Pickup from {settings.pickup_address}</p>}
-          {!settings.whatsapp_number && !ig && !settings.pickup_address && (
-            <p className="text-[13.5px] text-muted">Dubai, United Arab Emirates</p>
-          )}
-        </FooterCol>
-      </div>
-
-      <div className="border-t border-line">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-5 text-[12px] text-muted md:px-8">
-          <span>
-            © {new Date().getFullYear()} {settings.business_name}. Home baked in Dubai.
-          </span>
-          <span className="flex items-center gap-4">
-            <ThemeToggle />
-          </span>
         </div>
+        <nav aria-label="More" className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+          <Link href="/custom-cakes" className={linkCls}>Custom cakes</Link>
+          <Link href="/reviews" className={linkCls}>Reviews</Link>
+          <Link href="/track" className={linkCls}>Track an order</Link>
+          <Link href="/terms" className={linkCls}>Terms</Link>
+          <Link href="/privacy" className={linkCls}>Privacy</Link>
+        </nav>
+        <p className="text-[11.5px] text-muted">
+          © {new Date().getFullYear()} {settings.business_name}
+        </p>
       </div>
     </footer>
-  );
-}
-
-function FooterCol({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div>
-      {/* Global h2 styles are unlayered and would beat utilities, so the
-          footer's small label face is set inline. */}
-      <h2 className="mb-4 text-[12px] uppercase tracking-[0.14em] text-ink" style={{ fontFamily: "var(--font-body)", fontWeight: 700 }}>
-        {title}
-      </h2>
-      <div className="flex flex-col items-start gap-2.5">{children}</div>
-    </div>
   );
 }

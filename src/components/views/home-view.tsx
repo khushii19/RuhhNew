@@ -1,170 +1,183 @@
-import { Fragment } from "react";
 import Link from "next/link";
-import { Photo } from "@/components/photo";
-import { BrandLogo } from "@/components/brand-logo";
-import { HomeShop } from "@/components/home-shop";
+import { CalendarBlank, Moped, Wallet } from "@phosphor-icons/react/dist/ssr";
+import { Bestsellers } from "@/components/bestsellers";
 import { MenuUnavailable } from "@/components/menu-unavailable";
+import { Photo } from "@/components/photo";
+import { Reveal, RevealGroup } from "@/components/reveal";
+import { SpecialCard } from "@/components/special-card";
+import { SpecialsButton } from "@/components/specials-sheet";
 import { WhatsAppButton } from "@/components/whatsapp-button";
-import { Reveal } from "@/components/reveal";
-import { categoryArt } from "@/lib/category-art";
 import { getFeatured } from "@/lib/data";
-import { ArrowDown, CalendarBlank, Car, Cookie } from "@phosphor-icons/react/dist/ssr";
+import { env } from "@/lib/env";
 import type { Category, MenuItem, Settings, Special } from "@/lib/types";
-
-/** The centred max-w-6xl column, for content inside full-bleed bands. */
-const COLUMN = "mx-auto w-full max-w-6xl px-5 md:px-8";
-
-const HEADLINE = ["Treats", "baked", "with", "soul,"];
-const HEADLINE_EM = ["just", "for", "you."];
 
 export type HomeData = { settings: Settings; specials: Special[]; items: MenuItem[]; categories: Category[] };
 
 /** The home page body. The route fetches the data; the view only renders it. */
 export function HomeView({ settings, specials, items, categories }: HomeData) {
-  const first = settings.owner_name;
+  const owner = settings.owner_name;
   // Specials get their own row, so "Bestsellers" shows other bakes.
   const specialNames = new Set(specials.map((s) => s.name.trim().toLowerCase()));
   const featured = getFeatured(
     items.filter((m) => !specialNames.has(m.name.trim().toLowerCase())),
     4,
   );
-  const heroSrc = settings.hero_image_url;
+  const payments = [settings.accept_cash && "cash", settings.accept_bank_transfer && "bank transfer"].filter(Boolean).join(" or ");
+  const initials = owner
+    .split(/\s+/)
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
-    <>
-      {/* ---------- banner ----------
-          The sharp photo sits right (on top, in the flow, on phones) so the
-          bakes stay uncovered; a blurred copy of it fills the rest of the
-          band, and the text sits on that soft area in dark ink over a pastel
-          pink wash. Fixed colours: the banner is photo-lit in both themes. */}
-      <section className="bleed relative -mt-6 overflow-hidden bg-[#f7d6e0] md:-mt-10 md:h-[80svh] md:max-h-[860px] md:min-h-[600px]">
-        {heroSrc && <Photo src={heroSrc} alt="" fill sizes="40vw" className="scale-110 object-cover opacity-80 blur-2xl" />}
-        <div className="relative aspect-[5/4] w-full [mask-image:linear-gradient(to_bottom,black_75%,transparent)] md:absolute md:inset-y-0 md:right-0 md:aspect-auto md:h-full md:w-[66%] md:[mask-image:linear-gradient(to_right,transparent,black_30%)]">
-          {/* The wrapper drifts on scroll (parallax); the photo keeps its slow Ken Burns. */}
-          <div className="hero-parallax absolute inset-0">
-            <Photo
-              src={heroSrc ?? categoryArt("Cookies")}
-              alt={heroSrc ? `Freshly baked ${settings.business_name} cookies` : ""}
-              fill
-              priority
-              sizes="(max-width: 768px) 100vw, 66vw"
-              className="hero-photo object-cover"
-            />
-          </div>
-        </div>
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-[linear-gradient(to_top,#fbe3ea_0%,#fbe3eaf2_52%,transparent_66%)] md:bg-[linear-gradient(to_right,#fbe3eaf2_0%,#fbe3eab3_32%,transparent_56%)]"
-        />
+    <div className="mx-auto w-full max-w-[680px]">
+      <BakeryJsonLd settings={settings} />
 
-        <div className={`${COLUMN} relative -mt-10 pb-10 md:absolute md:inset-0 md:mt-0 md:flex md:flex-col md:justify-center md:pb-0`}>
-          <div className="max-w-[560px] text-[#2c1a1a]">
-            <p className="m-fade-up text-[12px] font-semibold uppercase tracking-[0.24em] text-[#9b4b6b]">Ruhh means soul</p>
-            <h1 className="words mt-3 pb-1 text-[40px] leading-[1.04] tracking-[-0.02em] text-[#2c1a1a] sm:text-[56px] lg:text-[70px]">
-              {/* Word-by-word entrance. The spans are inline-block, which trims a
-                  space inside them, so the gaps sit between spans. */}
-              {HEADLINE.map((w, i) => (
-                <Fragment key={w}>
-                  <span style={{ "--w": i } as React.CSSProperties}>{w}</span>{" "}
-                </Fragment>
-              ))}
-              <em className="whitespace-nowrap font-normal italic text-[#9b4b6b]">
-                {HEADLINE_EM.map((w, i) => (
-                  <Fragment key={w}>
-                    <span style={{ "--w": HEADLINE.length + i } as React.CSSProperties}>{w}</span>
-                    {i < HEADLINE_EM.length - 1 ? " " : ""}
-                  </Fragment>
-                ))}
-              </em>
-            </h1>
-            <p className="m-fade-up m-delay-2 mt-3 max-w-[36ch] text-[15.5px] leading-relaxed text-[#5a3a3a] md:mt-4 md:text-[18px]">
-              Homemade cookies, cheesecakes &amp; tiramisu from {first}&rsquo;s kitchen in Dubai.
-            </p>
-            <div className="m-fade-up m-delay-3 mt-7 flex flex-wrap items-center gap-3">
-              <a href="#bakes" className="press inline-flex items-center gap-2 rounded-full bg-[#9b4b6b] px-7 py-3.5 text-[14.5px] font-semibold text-white transition hover:brightness-110">
-                Order now <ArrowDown size={16} weight="bold" aria-hidden />
-              </a>
-              <Link
-                href="/custom-cakes"
-                className="press inline-flex items-center rounded-full border border-[#2c1a1a]/25 bg-white/50 px-6 py-3.5 text-[14.5px] font-semibold text-[#2c1a1a] backdrop-blur-sm transition hover:border-[#9b4b6b] hover:text-[#9b4b6b]"
-              >
-                Custom cakes
-              </Link>
+      {/* ---------- hero card ---------- */}
+      <section className="m-fade-up overflow-hidden rounded-[16px] border-[1.5px] border-line bg-cream2 text-center">
+        {settings.hero_image_url && (
+          <div className="p-3 pb-0">
+            <div className="relative aspect-[16/10] overflow-hidden rounded-[12px] bg-rose">
+              <Photo
+                src={settings.hero_image_url}
+                alt={`Freshly baked ${settings.business_name} cookies`}
+                fill
+                priority
+                sizes="(max-width: 720px) 100vw, 660px"
+                className="object-cover"
+              />
             </div>
+          </div>
+        )}
+        <div className="px-6 pb-8 pt-7 md:px-10">
+          <span className="inline-block rounded-full bg-rose px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.18em] text-rose-deep">Home baked · Dubai</span>
+          <h1 className="mt-4 text-[34px] leading-[1.15] md:text-[42px]">
+            Baked to <em className="font-normal italic text-rose-deep">perfection</em>.
+          </h1>
+          <p className="mx-auto mt-2 max-w-[42ch] text-[14.5px] leading-relaxed text-muted">
+            Handmade cookies, cheesecakes &amp; tiramisu, made slowly and from the heart by {owner}.
+          </p>
+          <p className="mt-2 text-[12px] tracking-[0.06em] text-lav-deep">— by {owner} · est. 2019 —</p>
+          <div className="mt-6 flex flex-wrap justify-center gap-2.5">
+            <Link href="/menu" className="btn-p press px-6 py-3 text-[14px] font-semibold">
+              Browse the menu
+            </Link>
+            <SpecialsButton specials={specials} settings={settings} className="btn-o press px-6 py-2.5 text-[14px] font-semibold" />
           </div>
         </div>
       </section>
 
-      {/* ---------- the shop ---------- */}
-      {items.length > 0 ? (
-        <HomeShop items={items} featured={featured} categories={categories} specials={specials} settings={settings} />
-      ) : (
-        <div className="pt-12 md:pt-16">
-          <MenuUnavailable ownerName={first} whatsappNumber={settings.whatsapp_number} />
-        </div>
-      )}
-
-      {/* ---------- the baker: a pastel pink band ---------- */}
-      <section id="about" aria-labelledby="about-title" className="bleed mt-20 scroll-mt-24 bg-rose md:mt-28">
-        <div className={`${COLUMN} grid items-center gap-10 py-16 md:grid-cols-2 md:gap-16 md:py-24`}>
-          <Reveal>
-            <div className="relative aspect-[4/3] overflow-hidden rounded-[22px] bg-peach shadow-[0_30px_60px_-35px_rgba(155,75,107,0.6)] md:aspect-[5/6]">
-              {settings.about_image_url && (
-                <Photo src={settings.about_image_url} alt={`${first} baking`} fill sizes="(max-width: 768px) 100vw, 540px" className="object-cover" />
-              )}
-            </div>
-          </Reveal>
-          <Reveal delay={120}>
-            <div className="md:max-w-[460px]">
-              <p className="text-[12px] font-semibold uppercase tracking-[0.24em] text-rose-deep">The baker behind Ruhh</p>
-              <h2 id="about-title" className="mt-4 text-[36px] leading-[1.08] md:text-[52px]">
-                Meet {first}.
-              </h2>
-              {settings.about_text && <p className="mt-5 font-display text-[19px] italic leading-[1.6] text-ink/80 md:text-[22px]">{settings.about_text}</p>}
-              <div className="mt-7 flex flex-wrap items-center gap-6">
-                <BrandLogo url={null} height={32} variant="wordmark" />
-                <WhatsAppButton
-                  number={settings.whatsapp_number}
-                  message={`Hi ${first}! I found ${settings.business_name} and would love to know more.`}
-                  className="press inline-flex items-center gap-2 rounded-full bg-[#15803d] px-5 py-3 text-[14px] font-semibold text-white transition hover:brightness-110"
-                >
-                  Message {first}
-                </WhatsAppButton>
+      {/* ---------- this week's specials ---------- */}
+      <Section title="This week’s specials">
+        {specials.length ? (
+          <RevealGroup className="grid gap-3">
+            {specials.map((s, i) => (
+              <div key={s.id} style={{ "--i": i } as React.CSSProperties}>
+                <SpecialCard special={s} leadTimeHours={settings.default_lead_time_hours} />
               </div>
-            </div>
-          </Reveal>
-        </div>
-      </section>
+            ))}
+          </RevealGroup>
+        ) : (
+          <p className="text-[13.5px] text-muted">No specials this week — check back soon.</p>
+        )}
+      </Section>
 
-      {/* ---------- ordering, in three facts ---------- */}
+      {/* ---------- bestsellers ---------- */}
+      <Section
+        title="Bestsellers"
+        action={
+          featured.length > 0 && (
+            <Link href="/menu" className="text-[13px] font-semibold text-rose-deep underline-offset-4 hover:underline">
+              Full menu →
+            </Link>
+          )
+        }
+      >
+        {featured.length > 0 ? (
+          <Bestsellers items={featured} categories={categories} settings={settings} />
+        ) : (
+          <MenuUnavailable ownerName={owner} whatsappNumber={settings.whatsapp_number} />
+        )}
+      </Section>
+
+      {/* ---------- say hello ---------- */}
       <Reveal>
-        <section aria-label="Ordering" className="grid gap-4 pt-12 sm:grid-cols-3 md:pt-16">
+        <section aria-labelledby="hello-title" className="mt-10 flex flex-col items-center gap-5 rounded-[16px] bg-rose px-6 py-8 text-center sm:flex-row sm:text-left">
+          <div className="relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-full border-4 border-surface bg-lav font-display text-[26px] text-lav-deep">
+            {settings.about_image_url ? (
+              <Photo src={settings.about_image_url} alt={owner} fill sizes="96px" className="object-cover" />
+            ) : (
+              <span aria-hidden>{initials}</span>
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <h2 id="hello-title" className="text-[23px] leading-tight">
+              Say hello to {owner}
+            </h2>
+            <p className="mt-1.5 text-[14px] leading-relaxed text-ink/75">
+              Every bake is made by hand in {owner}&rsquo;s Dubai kitchen. Questions, allergies or a special request? Just ask.
+            </p>
+            <div className="mt-4 flex justify-center sm:justify-start">
+              <WhatsAppButton
+                number={settings.whatsapp_number}
+                message={`Hi ${owner}! I found ${settings.business_name} and would love to know more.`}
+                className="press inline-flex items-center gap-2 rounded-full bg-[#15803d] px-5 py-3 text-[14px] font-semibold text-white transition hover:brightness-110"
+              >
+                Chat with {owner}
+              </WhatsAppButton>
+            </div>
+          </div>
+        </section>
+      </Reveal>
+
+      {/* ---------- how ordering works ---------- */}
+      <Section title="How ordering works">
+        <RevealGroup className="grid gap-2.5">
           {[
-            { Icon: CalendarBlank, text: `Order ${settings.default_lead_time_hours} hours ahead` },
-            { Icon: Car, text: settings.pickup_address ? "Delivery or free pickup" : "Delivered across Dubai" },
-            { Icon: Cookie, text: "Made in small batches" },
-          ].map(({ Icon, text }) => (
-            <div key={text} className="flex items-center gap-3 text-[14px] text-ink/85">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose text-rose-deep">
+            { Icon: CalendarBlank, text: `Order ${settings.default_lead_time_hours} hours ahead`, tone: "bg-lav text-lav-deep" },
+            { Icon: Moped, text: "Delivery across Dubai or free pickup", tone: "bg-sage text-sage-deep" },
+            { Icon: Wallet, text: payments ? `Pay by ${payments}` : "Pay when you collect", tone: "bg-peach text-peach-deep" },
+          ].map(({ Icon, text, tone }, i) => (
+            <div key={text} style={{ "--i": i } as React.CSSProperties} className="flex items-center gap-3.5 rounded-[12px] border border-line bg-surface px-4 py-3 text-[14px]">
+              <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${tone}`}>
                 <Icon size={19} weight="duotone" aria-hidden />
               </span>
               {text}
             </div>
           ))}
-        </section>
-      </Reveal>
-
-      {/* ---------- custom cakes ---------- */}
-      <Reveal>
-        <section className="mt-12 overflow-hidden rounded-[18px] bg-rose md:mt-16">
-          <div className="flex flex-col items-start gap-6 px-6 py-12 md:flex-row md:items-center md:justify-between md:px-14 md:py-14">
-            <h2 className="text-[30px] leading-[1.1] md:text-[38px]">Planning a celebration?</h2>
-            <Link href="/custom-cakes" className="btn-p press shrink-0 px-7 py-3.5 text-[14.5px] font-semibold">
-              Design a custom cake
-            </Link>
-          </div>
-        </section>
-      </Reveal>
-    </>
+        </RevealGroup>
+      </Section>
+    </div>
   );
+}
+
+function Section({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <section className="mt-10">
+      <Reveal>
+        <div className="mb-4 flex items-baseline justify-between gap-4">
+          <h2 className="text-[22px] leading-tight md:text-[24px]">{title}</h2>
+          {action}
+        </div>
+      </Reveal>
+      {children}
+    </section>
+  );
+}
+
+/** Tells search engines this is a bakery and how to reach it. */
+function BakeryJsonLd({ settings }: { settings: Settings }) {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "Bakery",
+    name: settings.business_name,
+    description: `Home-baked cookies, cheesecakes and tiramisu by ${settings.owner_name} in Dubai.`,
+    url: env.siteUrl,
+    image: settings.hero_image_url ?? undefined,
+    telephone: settings.whatsapp_number ? `+${settings.whatsapp_number}` : undefined,
+    address: { "@type": "PostalAddress", addressLocality: "Dubai", addressCountry: "AE" },
+    servesCuisine: "Desserts",
+  };
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, "\\u003c") }} />;
 }

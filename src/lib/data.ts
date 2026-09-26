@@ -2,6 +2,8 @@ import { publicClient } from "@/lib/supabase/public";
 import { isSupabaseConfigured } from "@/lib/env";
 import type { Category, DeliveryZone, MenuItem, Review, Settings, Special } from "@/lib/types";
 import { SEED_ABOUT, SEED_HERO, seedPhoto } from "@/lib/seed-photos";
+import { isSpecialLive } from "@/lib/specials";
+import { todayISO } from "@/lib/availability";
 
 const DEFAULT_SETTINGS: Settings = {
   id: 1,
@@ -88,7 +90,8 @@ export async function getSpecials(): Promise<Special[]> {
     .select("*")
     .eq("is_active", true)
     .order("sort_order");
-  return ((data ?? []) as Special[]).map((s) => ({
+  const today = todayISO();
+  return ((data ?? []) as Special[]).filter((s) => isSpecialLive(s, today)).map((s) => ({
     ...s,
     image_url: s.image_url || seedPhoto(s.name),
     price_aed: Number(s.price_aed),
@@ -123,6 +126,16 @@ export async function getApprovedReviews(limit = 20): Promise<Review[]> {
 
 export function itemMinPrice(m: MenuItem) {
   return m.item_sizes.length ? Math.min(...m.item_sizes.map((s) => Number(s.price_aed))) : 0;
+}
+
+/** Priced at zero: shown as "Price on request" and can't be added. */
+export function itemUnpriced(m: MenuItem) {
+  return itemMinPrice(m) <= 0;
+}
+
+/** Whether the basket can take this item right now. */
+export function itemOrderable(m: MenuItem) {
+  return !m.is_sold_out && !itemUnpriced(m);
 }
 
 export function itemHasOptions(m: MenuItem) {

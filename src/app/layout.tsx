@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, Playfair_Display } from "next/font/google";
+import { Lora } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { env } from "@/lib/env";
 
-const display = Playfair_Display({ subsets: ["latin"], style: ["normal", "italic"], weight: ["400", "500", "600", "700"], variable: "--font-playfair", display: "swap" });
-const body = DM_Sans({ subsets: ["latin"], style: ["normal", "italic"], weight: ["400", "500", "600", "700"], variable: "--font-dm-sans", display: "swap" });
+// One warm serif for the whole storefront, like the first build's Georgia.
+const lora = Lora({ subsets: ["latin"], style: ["normal", "italic"], weight: ["400", "500", "600", "700"], variable: "--font-lora", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(env.siteUrl),
@@ -23,25 +23,16 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbf7f2" },
-    { media: "(prefers-color-scheme: dark)", color: "#1c1315" },
-  ],
+  // Light only, so phones in dark mode still get the cream app.
+  themeColor: "#fbf7f2",
+  colorScheme: "light",
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable}`}>
-      <head>
-        <script
-          // Applies a saved theme choice before first paint to avoid a flash.
-          dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem("ruhh_theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}`,
-          }}
-        />
-      </head>
+    <html lang="en" className={lora.variable}>
       <body>
         {children}
         <Analytics />

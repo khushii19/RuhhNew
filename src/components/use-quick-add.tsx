@@ -2,10 +2,10 @@
 
 import { useCallback, useState } from "react";
 import { ItemPicker } from "@/components/item-picker";
-import { Toast } from "@/components/toast";
+import { Toast, type ToastMessage } from "@/components/toast";
 import { useCart } from "@/components/cart-context";
 import { categoryArt } from "@/lib/category-art";
-import { categoryLeadTime, itemHasOptions } from "@/lib/data";
+import { categoryLeadTime, itemHasOptions, itemOrderable } from "@/lib/data";
 import type { Category, MenuItem, Settings } from "@/lib/types";
 
 /**
@@ -17,11 +17,16 @@ export function useQuickAdd(categories: Category[], settings: Settings, initial:
   const { add } = useCart();
   const [picking, setPicking] = useState<MenuItem | null>(initial);
   const [flash, setFlash] = useState<string | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
+  const [toast, setToast] = useState<ToastMessage | null>(null);
   const clearToast = useCallback(() => setToast(null), []);
   const catName = useCallback((id: string | null) => categories.find((c) => c.id === id)?.name, [categories]);
 
+  const added = useCallback((name: string) => setToast({ text: `Added ${name}`, action: { label: "View basket", href: "/order" } }), []);
+
   function quickAdd(m: MenuItem) {
+    // Unpriced and sold-out bakes can't go in the basket; the card offers
+    // WhatsApp instead.
+    if (!itemOrderable(m)) return;
     if (itemHasOptions(m)) {
       setPicking(m);
       return;
@@ -44,11 +49,11 @@ export function useQuickAdd(categories: Category[], settings: Settings, initial:
       ),
     });
     setFlash(m.id);
-    setToast(`${m.name} added`);
+    added(m.name);
     setTimeout(() => setFlash(null), 900);
   }
 
-  return { picking, setPicking, flash, toast, setToast, clearToast, quickAdd, catName };
+  return { picking, setPicking, flash, toast, added, clearToast, quickAdd, catName };
 }
 
 export type QuickAdd = ReturnType<typeof useQuickAdd>;
@@ -67,7 +72,7 @@ export function QuickAddLayer({ shop, categories, settings }: { shop: QuickAdd; 
             settings,
           )}
           onClose={() => shop.setPicking(null)}
-          onAdded={(name) => shop.setToast(`${name} added`)}
+          onAdded={shop.added}
         />
       )}
       <Toast message={shop.toast} onDone={shop.clearToast} />

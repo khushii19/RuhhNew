@@ -48,6 +48,7 @@ integration for automated status messages.
    - `supabase/migrations/0002_photos_featured.sql`
    - `supabase/migrations/0003_operations.sql`
    - `supabase/migrations/0004_allergens.sql`
+   - `supabase/migrations/0005_master_prompt.sql` (order refs like RUH-260927-001, sold-out items, special dates, private order notes)
    - `supabase/seed.sql` — **first edit the last statement** to Shweta's real
      email (the first admin), and optionally the WhatsApp number / Instagram /
      pickup address in the first `update settings` block.
@@ -185,11 +186,12 @@ later without schema changes:
 Either would be wired in as a redirect from the checkout after the order is
 saved, with a webhook marking `payment_status = 'paid'`.
 
-## Dark mode
+## Look and feel
 
-The site follows the visitor's system preference and offers an Auto / Light /
-Dark switch in the footer. Everything is driven by colour tokens, so both
-themes stay in sync automatically; the logo swaps to a light-on-dark variant.
+The storefront is light only: cream background, rose / lavender / sage /
+peach accents and the Lora serif, after the first Ruhh build. Phones set to
+dark mode still see the light site (`color-scheme: light`). Colours live as
+tokens in `src/app/globals.css`.
 
 ## Local development
 

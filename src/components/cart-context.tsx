@@ -63,6 +63,8 @@ interface CartApi {
   add: (line: Omit<CartLine, "key">) => void;
   setQty: (key: string, qty: number) => void;
   remove: (key: string) => void;
+  /** Puts a removed line back where it was (the basket's Undo). */
+  restore: (line: CartLine, index: number) => void;
   clear: () => void;
   hydrated: boolean;
 }
@@ -90,14 +92,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const remove = useCallback((key: string) => setState(getSnapshot().filter((l) => l.key !== key)), []);
+  const restore = useCallback((line: CartLine, index: number) => {
+    const prev = getSnapshot().filter((l) => l.key !== line.key);
+    setState([...prev.slice(0, index), line, ...prev.slice(index)]);
+  }, []);
   const clear = useCallback(() => setState([]), []);
 
   const value = useMemo<CartApi>(() => {
     const count = lines.reduce((a, l) => a + l.qty, 0);
     const subtotal = lines.reduce((a, l) => a + l.unitPrice * l.qty, 0);
     const leadHours = lines.reduce((a, l) => Math.max(a, l.leadTimeHours || 0), 0);
-    return { lines, count, subtotal, leadHours, add, setQty, remove, clear, hydrated };
-  }, [lines, add, setQty, remove, clear, hydrated]);
+    return { lines, count, subtotal, leadHours, add, setQty, remove, restore, clear, hydrated };
+  }, [lines, add, setQty, remove, restore, clear, hydrated]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

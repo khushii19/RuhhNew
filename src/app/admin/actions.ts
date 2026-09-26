@@ -83,6 +83,46 @@ export async function updateOrderAdjustment(fd: FormData) {
   revalidatePath(`/admin/orders/${id}`);
 }
 
+export async function saveOrderNote(fd: FormData) {
+  await requireAdmin();
+  const id = str(fd, "id");
+  if (!id) return;
+  const { error } = await adminClient()
+    .from("orders")
+    .update({ admin_note: str(fd, "admin_note").slice(0, 2000) || null })
+    .eq("id", id);
+  if (error) console.warn("order note not saved (run migration 0005?)", error.message);
+  revalidatePath(`/admin/orders/${id}`);
+}
+
+/* ---------------- ordering (up / down) ---------------- */
+
+/**
+ * Moves a menu item (within its category) or a category one place up or
+ * down, then renumbers its group 1, 2, 3… so gaps and ties disappear.
+ */
+export async function moveRow(fd: FormData) {
+  await requireAdmin();
+  const table = str(fd, "table");
+  const id = str(fd, "id");
+  const dir = str(fd, "dir") === "up" ? -1 : 1;
+  if ((table !== "menu_items" && table !== "categories") || !id) return;
+  const db = adminClient();
+  let query = db.from(table).select("id, sort_order" + (table === "menu_items" ? ", category_id" : ""));
+  if (table === "menu_items") {
+    const { data: row } = await db.from("menu_items").select("category_id").eq("id", id).maybeSingle();
+    query = row?.category_id ? query.eq("category_id", row.category_id) : query.is("category_id", null);
+  }
+  const { data } = await query.order("sort_order").order("name");
+  const rows = ((data ?? []) as unknown as { id: string }[]).map((r) => r.id);
+  const i = rows.indexOf(id);
+  const j = i + dir;
+  if (i < 0 || j < 0 || j >= rows.length) return;
+  [rows[i], rows[j]] = [rows[j], rows[i]];
+  await Promise.all(rows.map((rid, k) => db.from(table).update({ sort_order: k + 1 }).eq("id", rid)));
+  revalidateStore();
+}
+
 /* ---------------- categories ---------------- */
 
 export async function saveCategory(fd: FormData) {
@@ -149,13 +189,13 @@ export async function saveMenuItem(fd: FormData) {
     })
     .eq("id", id);
 
-  // Separate write so a database that has not run migration 0004 yet still
-  // saves everything else; only the allergen note is lost there.
-  const { error: allergenError } = await db
+  // Separate write so a database that has not run migration 0005 yet still
+  // saves everything else; only the sold-out flag is lost there.
+  const { error: soldOutError } = await db
     .from("menu_items")
-    .update({ allergens: str(fd, "allergens") || null })
+    .update({ is_sold_out: bool(fd, "is_sold_out") })
     .eq("id", id);
-  if (allergenError) console.warn("allergens not saved (run migration 0004?)", allergenError.message);
+  if (soldOutError) console.warn("sold-out flag not saved (run migration 0005?)", soldOutError.message);
 
   // Sizes: rows arrive as size_label[], size_count[], size_price[], size_id[]
   const labels = fd.getAll("size_label").map(String);
@@ -313,8 +353,35 @@ export async function saveSpecial(fd: FormData) {
     sort_order: num(fd, "sort_order"),
   };
   const db = adminClient();
+  let specialId = id;
   if (id) await db.from("specials").update(row).eq("id", id);
-  else await db.from("specials").insert(row);
+  else {
+    const { data } = await db.from("specials").insert(row).select("id").single();
+    specialId = data?.id ?? "";
+  }
+  // Dates are a separate write so a database without migration 0005 still
+  // saves the rest of the special.
+  if (specialId) {
+    const date = (k: string) => (/^\d{4}-\d{2}-\d{2}$/.test(str(fd, k)) ? str(fd, k) : null);
+    const { error } = await db.from("specials").update({ starts_on: date("starts_on"), ends_on: date("ends_on") }).eq("id", specialId);
+    if (error) console.warn("special dates not saved (run migration 0005?)", error.message);
+  }
+  revalidateStore();
+}
+
+export async function uploadSpecialPhoto(fd: FormData) {
+  await requireAdmin();
+  const id = str(fd, "id");
+  const file = fd.get("photo");
+  if (!id || !(file instanceof File) || file.size === 0) return;
+  const url = await uploadToStorage(file, "specials");
+  await adminClient().from("specials").update({ image_url: url }).eq("id", id);
+  revalidateStore();
+}
+
+export async function removeSpecialPhoto(fd: FormData) {
+  await requireAdmin();
+  await adminClient().from("specials").update({ image_url: null }).eq("id", str(fd, "id"));
   revalidateStore();
 }
 

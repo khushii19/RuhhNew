@@ -2,6 +2,7 @@ import { adminClient } from "@/lib/supabase/admin";
 import type { Category } from "@/lib/types";
 import { deleteCategory, saveCategory } from "@/app/admin/actions";
 import { ConfirmButton } from "@/components/admin/confirm-button";
+import { MoveButtons } from "@/components/admin/move-buttons";
 
 export default async function CategoriesPage() {
   const { data } = await adminClient().from("categories").select("*, menu_items(count)").order("sort_order");
@@ -13,15 +14,16 @@ export default async function CategoriesPage() {
         Filter tabs customers see on the menu. Lead time is the minimum notice in hours for items in that category; leave blank to use the default from Settings.
       </p>
       <div className="grid gap-2">
-        <div className="grid grid-cols-[1fr_70px_90px_auto_auto] gap-1.5 px-1 text-[10px] uppercase tracking-wider text-muted">
+        <div className="grid grid-cols-[1fr_70px_90px_auto_auto] gap-1.5 pl-10 pr-1 text-[10px] uppercase tracking-wider text-muted">
           <span>Name</span>
           <span>Order</span>
           <span>Lead (h)</span>
           <span />
           <span />
         </div>
-        {cats.map((c) => (
+        {cats.map((c, idx) => (
           <div key={c.id} className="card flex items-center gap-1.5 p-2">
+            <MoveButtons table="categories" id={c.id} name={c.name} first={idx === 0} last={idx === cats.length - 1} />
             <form action={saveCategory} className="grid flex-1 grid-cols-[1fr_70px_90px_auto] gap-1.5">
               <input type="hidden" name="id" value={c.id} />
               <input name="name" defaultValue={c.name} required className="admin-input" />
