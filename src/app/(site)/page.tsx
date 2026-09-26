@@ -17,16 +17,10 @@ import { SpecialCard } from "@/components/special-card";
 import { WhatsAppButton } from "@/components/whatsapp-button";
 import { Signature } from "@/components/brand-logo";
 import { SectionHead } from "@/components/section-head";
-import { ArrowRight, Basket, Car, Fire } from "@phosphor-icons/react/dist/ssr";
+import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { Reveal } from "@/components/reveal";
 
 export const revalidate = 60;
-
-const STEPS = [
-  { Icon: Basket, title: "Choose your bakes", tint: "bg-lav text-lav-deep" },
-  { Icon: Fire, title: "Baked fresh for your date", tint: "bg-peach text-peach-deep" },
-  { Icon: Car, title: "Delivered or collected", tint: "bg-sage text-sage-deep" },
-];
 
 /** Soft grounds that show while a photo loads, cycled so neighbours differ. */
 const PASTELS = ["bg-rose", "bg-lav", "bg-sage", "bg-peach"];
@@ -58,7 +52,6 @@ export default async function HomePage() {
           />
         </div>
         <div className={`m-fade-up flex flex-col justify-center px-5 py-10 md:py-16 md:pr-12 ${COLUMN_START}`}>
-          <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.24em] text-rose-clay">A home bakery in Dubai</p>
           <h1 className="words pb-2 text-[42px] leading-[1.06] tracking-[-0.02em] sm:text-[52px] lg:text-[64px]">
             {/* The stagger spans are inline-block, which trims a space inside
                 them, so the gaps sit between spans. */}
@@ -76,8 +69,7 @@ export default async function HomePage() {
               ))}
             </em>
           </h1>
-          <p className="mt-5 text-[16px] text-muted md:text-[17px]">Baked by hand, in small batches, by {first}.</p>
-          <div className="mt-9 flex flex-wrap items-center gap-3">
+          <div className="mt-10 flex flex-wrap items-center gap-3">
             <Link href="/menu" className="btn-p press px-7 py-3.5 text-[14.5px] font-semibold">
               Order now <ArrowRight size={16} weight="bold" aria-hidden />
             </Link>
@@ -88,51 +80,31 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ---------- how it works ---------- */}
-      <section aria-label="How ordering works" className="bleed border-b border-line">
-        <ol className="mx-auto flex max-w-6xl flex-col gap-2.5 px-5 py-5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between md:px-8">
-          {STEPS.map((s) => (
-            <li key={s.title} className="flex items-center gap-3 text-[14px] text-ink/85">
-              <span className={`flex h-9 w-9 items-center justify-center rounded-full ${s.tint}`}>
-                <s.Icon size={18} weight="duotone" aria-hidden />
-              </span>
-              {s.title}
-            </li>
-          ))}
-        </ol>
-      </section>
-
       {/* ---------- categories ---------- */}
       {cats.length > 0 && (
         <Reveal>
           <section className="pt-16 md:pt-24">
-            <SectionHead eyebrow="The menu" title="Something for every table" href="/menu" linkLabel="View all" />
+            <SectionHead title="The menu" href="/menu" linkLabel="View all" />
             <div className="m-stagger -mx-5 flex scroll-px-5 snap-x snap-mandatory gap-3.5 overflow-x-auto px-5 pb-2 [scrollbar-width:none] md:mx-0 md:grid md:auto-cols-fr md:grid-flow-col md:gap-5 md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden">
-              {cats.map((c, i) => {
-                const count = items.filter((m) => m.category_id === c.id).length;
-                return (
-                  <Link
-                    key={c.id}
-                    href={`/menu?cat=${c.id}`}
-                    style={{ "--i": i } as React.CSSProperties}
-                    className="group w-[42vw] max-w-[200px] shrink-0 snap-start md:w-auto md:max-w-none"
-                  >
-                    <div className={`relative aspect-[4/5] overflow-hidden rounded-[14px] ${PASTELS[i % PASTELS.length]}`}>
-                      <Photo
-                        src={categoryCover(items, c.id) ?? categoryArt(c.name)}
-                        alt=""
-                        fill
-                        sizes="(max-width: 768px) 42vw, 230px"
-                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-                      />
-                    </div>
-                    <div className="mt-3.5 flex items-baseline justify-between gap-2">
-                      <span className="font-display text-[17px] leading-tight transition-colors group-hover:text-rose-deep md:text-[19px]">{c.name}</span>
-                      <span className="text-[12px] text-muted">{count}</span>
-                    </div>
-                  </Link>
-                );
-              })}
+              {cats.map((c, i) => (
+                <Link
+                  key={c.id}
+                  href={`/menu?cat=${c.id}`}
+                  style={{ "--i": i } as React.CSSProperties}
+                  className="group w-[42vw] max-w-[200px] shrink-0 snap-start md:w-auto md:max-w-none"
+                >
+                  <div className={`relative aspect-[4/5] overflow-hidden rounded-[14px] ${PASTELS[i % PASTELS.length]}`}>
+                    <Photo
+                      src={categoryCover(items, c.id) ?? categoryArt(c.name)}
+                      alt=""
+                      fill
+                      sizes="(max-width: 768px) 42vw, 230px"
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                    />
+                  </div>
+                  <div className="mt-3 font-display text-[17px] leading-tight transition-colors group-hover:text-rose-deep md:text-[19px]">{c.name}</div>
+                </Link>
+              ))}
             </div>
           </section>
         </Reveal>
@@ -142,7 +114,7 @@ export default async function HomePage() {
       {featured.length > 0 && (
         <Reveal>
           <section className="pt-16 md:pt-24">
-            <SectionHead eyebrow="Most ordered" title="Our favourites" />
+            <SectionHead title="Favourites" />
             <div className="m-stagger grid grid-cols-2 gap-x-4 gap-y-9 md:gap-x-6 lg:grid-cols-4">
               {featured.map((m, i) => {
                 const cat = categories.find((c) => c.id === m.category_id);
@@ -174,7 +146,7 @@ export default async function HomePage() {
       {specials.length > 0 && (
         <Reveal>
           <section className="pt-16 md:pt-24">
-            <SectionHead eyebrow="This week" title="Fresh from the oven" />
+            <SectionHead title="This week" />
             <div className={`m-stagger grid gap-5 md:gap-6 ${specials.length > 1 ? "lg:grid-cols-2" : "lg:max-w-3xl"}`}>
               {specials.map((s, i) => (
                 <div key={s.id} style={{ "--i": i } as React.CSSProperties}>
@@ -200,11 +172,9 @@ export default async function HomePage() {
               )}
             </div>
             <div className="md:max-w-[440px]">
-              <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-rose-clay">A note from the baker</p>
               <h2 id="about-title" className="text-[32px] leading-[1.1] tracking-[-0.01em] md:text-[42px]">
                 Hello, I&rsquo;m {first}
               </h2>
-              <p className="mt-6 font-display text-[19px] italic leading-[1.6] text-ink/80 md:text-[21px]">{settings.about_text}</p>
               <div className="mt-6">
                 <Signature size={92} />
               </div>
@@ -213,7 +183,7 @@ export default async function HomePage() {
                 message={`Hi ${first}! I found ${settings.business_name} and would love to know more.`}
                 className="press mt-6 inline-flex items-center gap-2 rounded-full bg-[#15803d] px-5 py-3 text-[14px] font-semibold text-white transition hover:brightness-110"
               >
-                Say hello on WhatsApp
+                Say hello
               </WhatsAppButton>
             </div>
           </div>
@@ -225,7 +195,6 @@ export default async function HomePage() {
         <section className="mt-16 overflow-hidden rounded-[14px] bg-rose md:mt-24">
           <div className="flex flex-col items-start gap-6 px-6 py-12 md:flex-row md:items-center md:justify-between md:px-14 md:py-14">
             <div>
-              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-rose-deep/80">Made for your moment</p>
               <h2 className="text-[30px] leading-[1.1] md:text-[38px]">Planning a celebration?</h2>
             </div>
             <Link href="/custom-cakes" className="btn-p press shrink-0 px-7 py-3.5 text-[14.5px] font-semibold">

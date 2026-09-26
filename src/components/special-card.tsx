@@ -52,7 +52,6 @@ export function SpecialCard({ special: s, leadTimeHours }: { special: Special; l
       <div className="flex flex-col p-6 md:p-8">
         {s.tag && <span className={`mb-4 self-start text-[11px] font-semibold uppercase tracking-[0.2em] ${a.text}`}>{s.tag}</span>}
         <h3 className="text-[24px] leading-tight md:text-[26px]">{s.name}</h3>
-        <p className="mt-3 line-clamp-3 text-[14px] leading-relaxed text-ink/70">{s.description}</p>
         <div className="mt-auto flex items-center justify-between gap-3 pt-7">
           <span className="flex items-baseline gap-2">
             <span className="font-display text-[22px] text-ink">{aed(s.price_aed)}</span>
