@@ -1,26 +1,32 @@
-import { Heart } from "@phosphor-icons/react/dist/ssr";
 import { Photo } from "@/components/photo";
 
-/**
- * The round Ruhh badge: a rose-deep circle with a white line heart, or the
- * logo uploaded in Settings shown inside the same circle.
+/*
+ * Ruhh's own marks, in public/brand: the script "Ruhh♡" wordmark and the
+ * gold-ringed circle versions of it. A logo uploaded in Settings takes the
+ * wordmark's place.
  */
-export function BrandBadge({ url, size = 40 }: { url: string | null; size?: number }) {
+
+/** The script "Ruhh♡" wordmark, for the header. Width follows the height. */
+export function Wordmark({ url, height = 36, priority = false }: { url?: string | null; height?: number; priority?: boolean }) {
+  if (url) return <Photo src={url} alt="Ruhh" width={height * 3} height={height} className="w-auto object-contain" style={{ height }} priority={priority} />;
+  return <Photo src="/brand/ruhh-wordmark.svg" alt="Ruhh" width={Math.round(height * 2.73)} height={height} style={{ height, width: "auto" }} priority={priority} />;
+}
+
+/** The round mark: "Ruhh♡" in a gold ring on cream. */
+export function BrandSeal({ size = 88, variant = "icon", className = "" }: { size?: number; variant?: "icon" | "primary"; className?: string }) {
   return (
-    <span
-      className="relative flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-rose-deep text-white"
+    <Photo
+      src={variant === "primary" ? "/brand/ruhh-primary.svg" : "/brand/ruhh-icon.svg"}
+      alt="Ruhh"
+      width={size}
+      height={size}
+      className={`rounded-full ${className}`}
       style={{ width: size, height: size }}
-    >
-      {url ? (
-        <Photo src={url} alt="" fill sizes={`${size}px`} className="object-cover" priority />
-      ) : (
-        <Heart size={Math.round(size * 0.52)} weight="light" aria-hidden />
-      )}
-    </span>
+    />
   );
 }
 
-/** The Ruhh monogram, used on the admin screens. */
+/** The "R♡" monogram, used on the admin screens. */
 export function Monogram({ size = 36 }: { size?: number }) {
   return <Photo src="/brand/ruhh-monogram.svg" alt="Ruhh" width={size} height={size} className="rounded-full bg-cream" />;
 }

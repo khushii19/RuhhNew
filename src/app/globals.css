@@ -416,3 +416,19 @@ h3,
   --font-display: var(--font-body);
   font-family: var(--font-body);
 }
+
+/* ---------- home hero ----------
+   The photo settles in slowly; still under reduced motion. */
+@keyframes hero-zoom {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-zoom {
+    animation: hero-zoom 2.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+}
