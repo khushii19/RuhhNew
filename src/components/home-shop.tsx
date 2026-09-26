@@ -31,8 +31,8 @@ export function HomeShop({
   const shop = useQuickAdd(categories, settings);
   const cats = categories.filter((c) => items.some((i) => i.category_id === c.id));
   const sections: Section[] = [
-    ...(featured.length ? [{ id: "most-loved", label: "Most loved" }] : []),
-    ...(specials.length ? [{ id: "this-week", label: "This week" }] : []),
+    ...(featured.length ? [{ id: "most-loved", label: "Bestsellers" }] : []),
+    ...(specials.length ? [{ id: "this-week", label: "Specials" }] : []),
     ...cats.map((c) => ({ id: `cat-${c.id}`, label: c.name })),
   ];
   const [active, setActive] = useState(sections[0]?.id ?? "");
@@ -98,11 +98,11 @@ export function HomeShop({
         </div>
       </nav>
 
-      {/* ---------- most loved ---------- */}
+      {/* ---------- bestsellers ---------- */}
       {featured.length > 0 && (
         <section id="most-loved" aria-labelledby="most-loved-title" className="scroll-mt-[124px] pt-10 md:scroll-mt-[156px] md:pt-14">
           <h2 id="most-loved-title" className="mb-6 text-[28px] leading-tight md:text-[36px]">
-            Most loved
+            Bestsellers
           </h2>
           <div className="-mx-5 flex scroll-px-5 snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-2 [scrollbar-width:none] md:mx-0 md:grid md:grid-cols-4 md:gap-6 md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden">
             {featured.slice(0, 4).map((m, i) => (
@@ -118,7 +118,7 @@ export function HomeShop({
       {specials.length > 0 && (
         <section id="this-week" aria-labelledby="this-week-title" className="scroll-mt-[124px] pt-12 md:scroll-mt-[156px] md:pt-16">
           <h2 id="this-week-title" className="mb-6 text-[28px] leading-tight md:text-[36px]">
-            Baking this week
+            This week&rsquo;s specials
           </h2>
           <div className="grid gap-4 md:grid-cols-2 md:gap-6">
             {specials.map((s) => (

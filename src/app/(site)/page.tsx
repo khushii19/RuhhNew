@@ -32,59 +32,63 @@ export default async function HomePage() {
   );
   const rating = reviews.length ? reviews.reduce((a, r) => a + r.rating, 0) / reviews.length : 0;
   const nextDate = availableDates(settings.default_lead_time_hours, settings, 14)[0];
+  const heroSrc = settings.hero_image_url;
 
   return (
     <>
-      {/* ---------- cinematic banner ---------- */}
-      <section className="bleed relative -mt-6 h-[74svh] max-h-[780px] min-h-[480px] overflow-hidden bg-[#1c1113] md:-mt-10 md:h-[78svh]">
-        <Photo
-          src={settings.hero_image_url ?? categoryArt("Cheesecakes")}
-          alt={settings.hero_image_url ? `A table of ${settings.business_name} bakes` : ""}
-          fill
-          priority
-          sizes="100vw"
-          className="hero-photo object-cover"
+      {/* ---------- cinematic banner ----------
+          The sharp photo sits right (on top, in the flow, on phones) so the
+          bakes stay uncovered; a blurred copy of it fills the rest of the band, and
+          the text sits on that soft area in dark ink over a light cream
+          wash. Fixed colours: the banner is photo-lit in both themes. */}
+      <section className="bleed relative -mt-6 overflow-hidden bg-[#efe6da] md:-mt-10 md:h-[80svh] md:max-h-[860px] md:min-h-[600px]">
+        {heroSrc && <Photo src={heroSrc} alt="" fill sizes="40vw" className="scale-110 object-cover opacity-90 blur-2xl" />}
+        <div className="relative aspect-[5/4] w-full [mask-image:linear-gradient(to_bottom,black_75%,transparent)] md:absolute md:inset-y-0 md:right-0 md:aspect-auto md:h-full md:w-[66%] md:[mask-image:linear-gradient(to_right,transparent,black_30%)]">
+          <Photo
+            src={heroSrc ?? categoryArt("Cookies")}
+            alt={heroSrc ? `Freshly baked ${settings.business_name} cookies` : ""}
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 66vw"
+            className="hero-photo object-cover"
+          />
+        </div>
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-[linear-gradient(to_top,#fbf7f2_0%,#fbf7f2f2_52%,transparent_66%)] md:bg-[linear-gradient(to_right,#fbf7f2f2_0%,#fbf7f2b3_32%,transparent_56%)]"
         />
-        {/* Scrim: dark enough at the bottom-left for white type, clear elsewhere. */}
-        <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-[#1c1113]/85 via-[#1c1113]/30 to-transparent" />
-        <div aria-hidden className="absolute inset-0 hidden bg-gradient-to-r from-[#1c1113]/55 via-transparent to-transparent md:block" />
 
-        <div className={`${COLUMN} relative flex h-full flex-col justify-end pb-10 md:pb-16`}>
-          <div className="m-fade-up max-w-[640px] text-white">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.24em] text-white/80">Home bakery · Dubai</p>
-            <h1 className="mt-4 pb-1 text-[46px] leading-[1.02] tracking-[-0.02em] text-white sm:text-[60px] lg:text-[76px]">
-              Baked to order, <em className="whitespace-nowrap font-normal italic text-[#f7d6e0]">by hand.</em>
+        <div className={`${COLUMN} relative -mt-10 pb-10 md:absolute md:inset-0 md:mt-0 md:flex md:flex-col md:justify-center md:pb-0`}>
+          <div className="m-fade-up max-w-[560px] text-[#2c1a1a]">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.24em] text-[#9b4b6b]">Ruhh means soul</p>
+            <h1 className="mt-3 pb-1 text-[40px] leading-[1.04] tracking-[-0.02em] text-[#2c1a1a] sm:text-[56px] lg:text-[70px]">
+              Treats baked with soul, <em className="whitespace-nowrap font-normal italic text-[#9b4b6b]">just for you.</em>
             </h1>
-            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-[14px] text-white/85">
-              {settings.about_image_url && (
-                <span className="flex items-center gap-2.5">
-                  <span className="relative h-8 w-8 overflow-hidden rounded-full ring-2 ring-white/70">
-                    <Photo src={settings.about_image_url} alt="" fill sizes="32px" className="object-cover" />
-                  </span>
-                  Baked by {first}
-                </span>
-              )}
+            <p className="mt-3 max-w-[36ch] text-[15.5px] leading-relaxed text-[#5a3a3a] md:mt-4 md:text-[18px]">
+              Homemade cookies, cheesecakes &amp; tiramisu from {first}&rsquo;s kitchen in Dubai.
+            </p>
+            <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[14px] text-[#5a3a3a]">
               {nextDate && (
                 <span className="flex items-center gap-1.5">
                   <CalendarBlank size={16} aria-hidden />
-                  Next available <span className="font-semibold text-white">{fmtDate(nextDate)}</span>
+                  Earliest delivery: <span className="font-semibold text-[#2c1a1a]">{fmtDate(nextDate)}</span>
                 </span>
               )}
               {reviews.length > 0 && (
-                <Link href="/reviews" className="flex items-center gap-1.5 hover:text-white">
-                  <Star size={15} weight="fill" className="text-peach-mid" aria-hidden />
-                  <span className="price font-semibold text-white">{rating.toFixed(1)}</span>· {reviews.length}{" "}
+                <Link href="/reviews" className="flex items-center gap-1.5 hover:text-[#9b4b6b]">
+                  <Star size={15} weight="fill" className="text-[#e8a870]" aria-hidden />
+                  <span className="price font-semibold text-[#2c1a1a]">{rating.toFixed(1)}</span>· {reviews.length}{" "}
                   {reviews.length === 1 ? "review" : "reviews"}
                 </Link>
               )}
             </div>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <a href="#bakes" className="press inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-[14.5px] font-semibold text-[#2c1a1a] transition hover:bg-[#f7d6e0]">
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <a href="#bakes" className="press inline-flex items-center gap-2 rounded-full bg-[#9b4b6b] px-7 py-3.5 text-[14.5px] font-semibold text-white transition hover:brightness-110">
                 Order now <ArrowDown size={16} weight="bold" aria-hidden />
               </a>
               <Link
                 href="/custom-cakes"
-                className="press inline-flex items-center rounded-full border border-white/50 px-6 py-3.5 text-[14.5px] font-semibold text-white backdrop-blur-sm transition hover:border-white hover:bg-white/10"
+                className="press inline-flex items-center rounded-full border border-[#2c1a1a]/25 bg-white/40 px-6 py-3.5 text-[14.5px] font-semibold text-[#2c1a1a] backdrop-blur-sm transition hover:border-[#9b4b6b] hover:text-[#9b4b6b]"
               >
                 Custom cakes
               </Link>
@@ -109,7 +113,7 @@ export default async function HomePage() {
         <Reveal className="relative">
           <div className={`${COLUMN} flex min-h-[560px] flex-col justify-end pb-14 md:min-h-[640px] md:pb-20`}>
             <div className="max-w-[620px] text-white">
-              <p className="text-[12px] font-semibold uppercase tracking-[0.24em] text-white/75">A note from the baker</p>
+              <p className="text-[12px] font-semibold uppercase tracking-[0.24em] text-white/75">The baker behind Ruhh</p>
               <h2 id="about-title" className="mt-4 text-[36px] leading-[1.08] text-white md:text-[52px]">
                 Meet {first}.
               </h2>
@@ -135,7 +139,7 @@ export default async function HomePage() {
       {/* ---------- ordering, in three facts ---------- */}
       <section aria-label="Ordering" className="grid gap-4 pt-12 sm:grid-cols-3 md:pt-16">
         {[
-          { Icon: CalendarBlank, text: `Baked for your date · ${settings.default_lead_time_hours}h notice`, tint: "bg-lav text-lav-deep" },
+          { Icon: CalendarBlank, text: `Order ${settings.default_lead_time_hours} hours ahead`, tint: "bg-lav text-lav-deep" },
           { Icon: Car, text: settings.pickup_address ? "Delivery or free pickup" : "Delivered across Dubai", tint: "bg-sage text-sage-deep" },
           { Icon: Star, text: reviews.length ? `Rated ${rating.toFixed(1)} by customers` : "Made in small batches", tint: "bg-peach text-peach-deep" },
         ].map(({ Icon, text, tint }) => (
