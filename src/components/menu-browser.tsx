@@ -1,22 +1,14 @@
 "use client";
 
-import { Photo } from "@/components/photo";
 import { MagnifyingGlass } from "@phosphor-icons/react";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
-import { ItemPicker } from "@/components/item-picker";
+import { useMemo, useState } from "react";
 import { CartBar } from "@/components/cart-bar";
-import { Toast } from "@/components/toast";
 import { MenuUnavailable } from "@/components/menu-unavailable";
+import { ProductCard } from "@/components/product-card";
+import { QuickAddLayer, useQuickAdd } from "@/components/use-quick-add";
 import { categoryArt } from "@/lib/category-art";
-import { useCart } from "@/components/cart-context";
-import { itemHasOptions, itemMinPrice, categoryLeadTime } from "@/lib/data";
-import { aed } from "@/lib/format";
 import type { Category, MenuItem, Settings } from "@/lib/types";
-
-/** Pastel grounds behind each photo, cycled so adjacent tiles differ. */
-const TILE_BG = ["bg-rose", "bg-lav", "bg-sage", "bg-peach"];
-
 
 export function MenuBrowser({ items, categories, settings }: { items: MenuItem[]; categories: Category[]; settings: Settings }) {
   const params = useSearchParams();
@@ -24,12 +16,12 @@ export function MenuBrowser({ items, categories, settings }: { items: MenuItem[]
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>(initialCat && categories.some((c) => c.id === initialCat) ? initialCat : "all");
   // /menu?item=<id> (from the home page) opens that bake's product view.
-  const [picking, setPicking] = useState<MenuItem | null>(() => items.find((m) => m.id === params.get("item")) ?? null);
-  const [flash, setFlash] = useState<string | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
-  const clearToast = useCallback(() => setToast(null), []);
-  const { add } = useCart();
-  const catName = (id: string | null) => categories.find((c) => c.id === id)?.name;
+  const shop = useQuickAdd(
+    categories,
+    settings,
+    items.find((m) => m.id === params.get("item")) ?? null,
+  );
+  const { catName } = shop;
 
   const usedCats = categories.filter((c) => items.some((i) => i.category_id === c.id));
 
@@ -45,32 +37,6 @@ export function MenuBrowser({ items, categories, settings }: { items: MenuItem[]
       );
     });
   }, [items, q, cat]);
-
-  /** The "+" on a card: adds single-size bakes directly, otherwise opens the product view. */
-  function quickAdd(m: MenuItem) {
-    if (itemHasOptions(m)) {
-      setPicking(m);
-      return;
-    }
-    const s = m.item_sizes[0];
-    if (!s) return;
-    const category = categories.find((c) => c.id === m.category_id);
-    add({
-      kind: "item",
-      itemId: m.id,
-      sizeId: s.id,
-      qty: 1,
-      name: m.name,
-      emoji: m.emoji,
-      image: m.image_url,
-      sizeLabel: s.label,
-      unitPrice: Number(s.price_aed),
-      leadTimeHours: categoryLeadTime(category, settings),
-    });
-    setFlash(m.id);
-    setToast(`${m.name} added`);
-    setTimeout(() => setFlash(null), 900);
-  }
 
   const current = cat === "all" ? "Everything" : catName(cat) ?? "Everything";
   const countFor = (id: string) => items.filter((m) => m.category_id === id).length;
@@ -146,75 +112,24 @@ export function MenuBrowser({ items, categories, settings }: { items: MenuItem[]
             </div>
           ) : (
             <div key={`${cat}-${q}`} className="m-stagger mb-20 grid grid-cols-2 gap-x-4 gap-y-9 md:mb-0 md:grid-cols-3 md:gap-x-6 md:gap-y-12">
-              {list.map((m, i) => {
-                const multi = m.item_sizes.length > 1;
-                const flav = m.item_flavours.slice(0, 3).map((f) => f.name).join(", ") + (m.item_flavours.length > 3 ? "\u2026" : "");
-                return (
-                  <div key={m.id} style={{ "--i": Math.min(i, 12) } as React.CSSProperties} className="group flex flex-col">
-                    <div className="relative">
-                      {/* Photo and text both open the product view; the photo
-                          copy is skipped by keyboard and screen readers so the
-                          card has one focus stop plus its add button. */}
-                      <button type="button" tabIndex={-1} aria-hidden onClick={() => setPicking(m)} className="block w-full">
-                        <div className={`relative aspect-[4/5] overflow-hidden rounded-[14px] ${TILE_BG[i % 4]}`}>
-                          <Photo
-                            src={m.image_url ?? categoryArt(catName(m.category_id))}
-                            alt=""
-                            fill
-                            sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 300px"
-                            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-                          />
-                        </div>
-                      </button>
-                      {itemHasOptions(m) ? (
-                        <button
-                          type="button"
-                          aria-label={`Choose options for ${m.name}`}
-                          onClick={() => setPicking(m)}
-                          className="press absolute bottom-3 right-3 rounded-full bg-surface px-3.5 py-1.5 text-[12.5px] font-semibold md:px-4 md:py-2 md:text-[13px] text-ink shadow-[0_8px_18px_-8px_rgba(44,26,26,0.5)] transition hover:bg-rose-deep hover:text-on-accent"
-                        >
-                          Choose
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          aria-label={`Add ${m.name} to basket`}
-                          onClick={() => quickAdd(m)}
-                          className={`press absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full text-[19px] leading-none shadow-[0_8px_18px_-8px_rgba(44,26,26,0.5)] transition ${
-                            flash === m.id ? "m-pop bg-sage text-sage-deep" : "bg-surface text-ink hover:bg-rose-deep hover:text-on-accent"
-                          }`}
-                        >
-                          {flash === m.id ? "\u2713" : "+"}
-                        </button>
-                      )}
-                    </div>
-                    <button type="button" onClick={() => setPicking(m)} className="mt-3.5 flex flex-1 flex-col rounded-[6px] text-left outline-offset-4">
-                      <span className="font-display text-[16.5px] leading-snug transition-colors group-hover:text-rose-deep md:text-[18px]">{m.name}</span>
-                      <span className="mt-1 line-clamp-2 text-[13px] leading-snug text-muted">{m.description}</span>
-                      {flav && <span className="mt-1 line-clamp-1 text-[12px] text-lav-deep">{flav}</span>}
-                      <span className="price mt-2 text-[14px] font-semibold text-ink">
-                        {multi && <span className="font-normal text-muted">From </span>}
-                        {aed(itemMinPrice(m))}
-                      </span>
-                    </button>
-                  </div>
-                );
-              })}
+              {list.map((m, i) => (
+                <div key={m.id} style={{ "--i": Math.min(i, 12) } as React.CSSProperties}>
+                  <ProductCard
+                    item={m}
+                    index={i}
+                    artUrl={categoryArt(catName(m.category_id))}
+                    flashing={shop.flash === m.id}
+                    onOpen={() => shop.setPicking(m)}
+                    onQuickAdd={() => shop.quickAdd(m)}
+                  />
+                </div>
+              ))}
             </div>
           )}
         </div>
       </div>
 
-      {picking && (
-        <ItemPicker
-          item={picking}
-          artUrl={categoryArt(catName(picking.category_id))}
-          leadTimeHours={categoryLeadTime(categories.find((c) => c.id === picking.category_id), settings)}
-          onClose={() => setPicking(null)}
-          onAdded={(name) => setToast(`${name} added`)}
-        />
-      )}
-      <Toast message={toast} onDone={clearToast} />
+      <QuickAddLayer shop={shop} categories={categories} settings={settings} />
       <CartBar />
     </>
   );

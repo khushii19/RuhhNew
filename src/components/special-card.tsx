@@ -38,31 +38,37 @@ export function SpecialCard({ special: s, leadTimeHours }: { special: Special; l
   }
 
   const a = ACCENT[s.accent] ?? ACCENT.rose;
+  // A compact strip: square photo, name, price and one action.
   return (
-    <article className={`group grid h-full overflow-hidden rounded-[14px] sm:grid-cols-[1.05fr_0.95fr] ${a.bg}`}>
-      <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden text-[48px] sm:aspect-auto sm:min-h-[300px]">
+    <article className={`group grid h-full grid-cols-[112px_1fr] overflow-hidden rounded-[14px] sm:grid-cols-[150px_1fr] ${a.bg}`}>
+      <div className="relative flex min-h-[124px] items-center justify-center overflow-hidden text-[40px]">
         {s.image_url ? (
           <Photo
             src={s.image_url}
             alt={s.name}
             fill
-            sizes="(max-width: 640px) 100vw, 320px"
-            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+            sizes="150px"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
           />
         ) : (
           s.emoji
         )}
       </div>
-      <div className="flex flex-col p-6 md:p-8">
-        {s.tag && <span className={`mb-4 self-start text-[11px] font-semibold uppercase tracking-[0.2em] ${a.text}`}>{s.tag}</span>}
-        <h3 className="text-[24px] leading-tight md:text-[26px]">{s.name}</h3>
-        <div className="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-4 pt-7">
+      <div className="flex min-w-0 flex-col justify-center gap-1 p-4 sm:p-5">
+        {s.tag && <span className={`text-[10.5px] font-semibold uppercase tracking-[0.2em] ${a.text}`}>{s.tag}</span>}
+        <h3 className="truncate text-[19px] leading-tight sm:text-[21px]">{s.name}</h3>
+        <div className="mt-2 flex items-center justify-between gap-3">
           <span className="flex items-baseline gap-2 whitespace-nowrap">
-            <span className="price font-display text-[22px] text-ink">{aed(s.price_aed)}</span>
-            {s.old_price_aed != null && <span className="text-[13px] text-muted line-through">{aed(s.old_price_aed)}</span>}
+            <span className="price text-[15px] font-semibold text-ink">{aed(s.price_aed)}</span>
+            {s.old_price_aed != null && <span className="price text-[12.5px] text-muted line-through">{aed(s.old_price_aed)}</span>}
           </span>
-          <button onClick={order} className="btn-p press whitespace-nowrap px-5 py-2.5 text-[13px] font-semibold" disabled={s.price_aed <= 0}>
-            Add to basket
+          <button
+            onClick={order}
+            aria-label={`Add ${s.name} to basket`}
+            className="btn-p press whitespace-nowrap px-4 py-2 text-[12.5px] font-semibold"
+            disabled={s.price_aed <= 0}
+          >
+            Add
           </button>
         </div>
       </div>

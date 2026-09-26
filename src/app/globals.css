@@ -30,6 +30,12 @@
 html {
   color-scheme: light dark;
 }
+/* Section pills and "Order now" jump within the page. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
 
 /* ---------- dark theme ----------
    Tokens only: every utility reads these variables, so the whole app
