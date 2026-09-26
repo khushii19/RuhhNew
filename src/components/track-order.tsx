@@ -143,7 +143,7 @@ export function TrackOrder({ settings, items, categories }: { settings: Settings
         !loading &&
         !recent.length &&
         !params.get("ref") && (
-          <div className="mb-6 rounded-[16px] border border-line bg-surface px-6 py-10 text-center">
+          <div className="mb-6 rounded-[16px] border-[1.5px] border-dashed border-rose-mid/70 bg-surface px-6 py-10 text-center">
             <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-rose text-rose-deep">
               <Package size={28} aria-hidden />
             </span>

@@ -79,7 +79,7 @@ export function MenuBrowser({ items, categories, settings }: { items: MenuItem[]
       </div>
 
       {list.length === 0 ? (
-        <div className="mx-auto max-w-[680px] rounded-[16px] border border-line bg-surface px-6 py-14 text-center">
+        <div className="mx-auto max-w-[680px] rounded-[16px] border-[1.5px] border-dashed border-rose-mid/70 bg-surface px-6 py-14 text-center">
           <p className="text-[15px] text-ink">{q.trim() ? `No treats found for ‘${q.trim()}’.` : "No treats here yet."}</p>
           <button
             type="button"

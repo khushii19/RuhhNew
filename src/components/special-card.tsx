@@ -51,7 +51,7 @@ export function SpecialCard({ special: s, leadTimeHours }: { special: Special; l
   }
 
   return (
-    <article className="flex items-center gap-4 rounded-[16px] border border-line bg-surface p-3 pr-4">
+    <article className={`flex items-center gap-4 rounded-[16px] border-[1.5px] border-dashed bg-surface p-3 pr-4 ${a.border}`}>
       <div className={`relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-[12px] text-[40px] md:h-28 md:w-28 ${a.bg}`}>
         {s.image_url ? <Photo src={s.image_url} alt={s.name} fill sizes="112px" className="object-cover" /> : <span aria-hidden>{s.emoji}</span>}
       </div>

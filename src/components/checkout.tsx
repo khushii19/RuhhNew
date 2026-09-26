@@ -209,7 +209,7 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
 
   if (!cart.lines.length) {
     return (
-      <div className="rounded-[16px] border border-line bg-surface px-6 py-14 text-center">
+      <div className="rounded-[16px] border-[1.5px] border-dashed border-rose-mid/70 bg-surface px-6 py-14 text-center">
         <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-rose text-rose-deep">
           <Basket size={30} aria-hidden />
         </span>
@@ -407,7 +407,7 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
         {settings.accept_bank_transfer && <Radio checked={payment === "bank_transfer"} onChange={() => setPayment("bank_transfer")} title="Bank transfer" sub="Details come after you order" />}
       </div>
 
-      <div className="mb-2 rounded-[16px] bg-peach p-5 text-[14px] text-peach-deep">
+      <div className="mb-2 rounded-[16px] border-[1.5px] border-dashed border-rose-mid bg-rose/50 p-5 text-[14px] text-rose-deep">
         <div className="flex justify-between py-0.5">
           <span>
             Subtotal · {cart.count} {cart.count === 1 ? "item" : "items"}
@@ -418,7 +418,7 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
           <span>{mode === "pickup" ? "Pickup" : "Delivery"}</span>
           <span className="price">{mode === "pickup" ? "Free" : deliveryFee ? aed(deliveryFee) : zone ? "Free" : "Choose your area"}</span>
         </div>
-        <div className="mt-2 flex justify-between border-t border-peach-mid/40 pt-3 text-[17px] font-semibold text-ink">
+        <div className="mt-2 flex justify-between border-t border-dashed border-rose-mid pt-3 text-[17px] font-semibold text-ink">
           <span>Total</span>
           <span className="price">{aed(total)}</span>
         </div>

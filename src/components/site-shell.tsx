@@ -36,7 +36,7 @@ function SiteFooter({ settings }: { settings: Settings }) {
   const ig = settings.instagram_handle?.replace(/^@/, "");
   const linkCls = "text-[13px] text-ink/75 transition-colors hover:text-rose-deep";
   return (
-    <footer className="border-t border-line bg-cream2 pb-24 md:pb-0">
+    <footer className="border-t-[1.5px] border-dashed border-rose-mid/70 bg-rose/40 pb-24 md:pb-0">
       <div className="mx-auto flex max-w-[680px] flex-col items-center gap-5 px-4 py-10 text-center">
         <Wordmark height={40} />
         <p className="-mt-2 text-[13.5px] text-muted">Handmade in Dubai since 2019</p>

@@ -4,7 +4,6 @@ import {
   CalendarCheck,
   ChatCircleDots,
   Moped,
-  Storefront,
 } from "@phosphor-icons/react/dist/ssr";
 import { HomeBestsellers } from "@/components/home-shop";
 import { MenuUnavailable } from "@/components/menu-unavailable";
@@ -49,91 +48,64 @@ export function HomeView({ settings, specials, items, categories }: HomeData) {
       };
     })
     .filter((s) => s.count > 0);
-  const pickup = settings.pickup_address?.split(",")[0]?.trim();
 
   return (
     <div className="mx-auto w-full max-w-[1080px]">
       <BakeryJsonLd settings={settings} />
 
-      {/* ---------- hero: photo and words, no box around them ---------- */}
-      <section className="grid items-center gap-8 md:grid-cols-[1fr_1.05fr] md:gap-16">
-        <div className="md:order-2">
-          <div className="relative aspect-[5/4] overflow-hidden rounded-[16px] bg-rose md:aspect-[4/5]">
-            {settings.hero_image_url && (
-              <Photo
-                src={settings.hero_image_url}
-                alt={`Freshly baked ${settings.business_name} cookies`}
-                fill
-                priority
-                sizes="(max-width: 768px) 100vw, 540px"
-                className="hero-zoom object-cover"
-              />
-            )}
+      {/* ---------- hero: a full-width pastel pink band with a big photo ---------- */}
+      <section className="bleed -mt-5 bg-rose md:-mt-8">
+        <div className="mx-auto grid max-w-[1080px] items-center md:grid-cols-[0.85fr_1.15fr] md:gap-12 md:px-6 md:py-12">
+          <div className="md:order-2">
+            <div className="relative aspect-square overflow-hidden bg-rose md:aspect-[5/6] md:rounded-[18px] md:border-[1.5px] md:border-dashed md:border-rose-deep/40 md:p-2.5">
+              <div className="relative h-full w-full overflow-hidden md:rounded-[12px]">
+                {settings.hero_image_url && (
+                  <Photo
+                    src={settings.hero_image_url}
+                    alt={`Freshly baked ${settings.business_name} cookies`}
+                    fill
+                    priority
+                    sizes="(max-width: 768px) 100vw, 620px"
+                    className="hero-zoom object-cover"
+                  />
+                )}
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div className="m-fade-up text-center md:order-1 md:text-left">
-          <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-rose-deep">
-            Handmade in Dubai since 2019
-          </p>
-          <h1 className="mt-3 text-[42px] leading-[1.05] tracking-[-0.01em] md:text-[64px]">
-            Baked to{" "}
-            <em className="font-normal italic text-rose-deep">perfection</em>.
-          </h1>
-          <p className="mx-auto mt-4 max-w-[36ch] text-[16px] leading-relaxed text-ink/70 md:mx-0 md:text-[18px]">
-            Small-batch cookies, cheesecakes and tiramisu, baked to order by{" "}
-            {owner}.
-          </p>
-          <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row md:justify-start">
-            <Link
-              href="/menu"
-              className="btn-p press min-h-[52px] w-full px-8 text-[15px] sm:w-auto"
-            >
-              Order now
-            </Link>
-            {specials.length > 0 && (
-              <SpecialsButton
-                specials={specials}
-                settings={settings}
-                className="btn-o min-h-[52px] w-full px-7 text-[15px] sm:w-auto"
-              />
-            )}
+          <div className="m-fade-up px-5 pb-10 pt-8 text-center md:order-1 md:px-0 md:py-0 md:text-left">
+            <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-rose-deep">Handmade in Dubai since 2019</p>
+            <h1 className="mt-3 text-[42px] leading-[1.05] tracking-[-0.01em] md:text-[60px]">
+              Baked to <em className="font-normal italic text-rose-deep">perfection</em>.
+            </h1>
+            <p className="mx-auto mt-4 max-w-[36ch] text-[16px] leading-relaxed text-ink/75 md:mx-0 md:text-[18px]">
+              Small-batch cookies, cheesecakes and tiramisu, baked to order by {owner}.
+            </p>
+            <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row md:justify-start">
+              <Link href="/menu" className="btn-p press min-h-[52px] w-full px-8 text-[15px] sm:w-auto">
+                Order now
+              </Link>
+              {specials.length > 0 && (
+                <SpecialsButton specials={specials} settings={settings} className="btn-o min-h-[52px] w-full border-rose-deep/30 px-7 text-[15px] sm:w-auto" />
+              )}
+            </div>
           </div>
         </div>
       </section>
 
       {/* ---------- the practical promises ---------- */}
       <Reveal>
-        <ul className="mt-12 grid grid-cols-2 gap-x-4 gap-y-5 border-y border-line py-6 md:mt-16 md:grid-cols-4 md:gap-8 md:py-7">
+        <ul className="mt-10 grid grid-cols-3 gap-3 border-y-[1.5px] border-dashed border-rose-mid/70 py-6 md:mt-14 md:gap-8 md:py-7">
           {[
-            {
-              Icon: CalendarCheck,
-              title: "Baked to order",
-              sub: `Order ${settings.default_lead_time_hours} hours ahead`,
-            },
+            { Icon: CalendarCheck, title: "Baked to order", sub: `Order ${settings.default_lead_time_hours} hours ahead` },
             { Icon: Moped, title: "Delivery", sub: "Across Dubai" },
-            {
-              Icon: Storefront,
-              title: "Free pickup",
-              sub: pickup ? `In ${pickup}` : "From our kitchen",
-            },
-            {
-              Icon: ChatCircleDots,
-              title: "Personal service",
-              sub: `${owner} confirms every order`,
-            },
+            { Icon: ChatCircleDots, title: "Personal service", sub: `${owner} confirms every order` },
           ].map(({ Icon, title, sub }) => (
-            <li key={title} className="flex items-start gap-3">
-              <Icon
-                size={22}
-                className="mt-0.5 shrink-0 text-rose-deep"
-                aria-hidden
-              />
+            <li key={title} className="flex flex-col items-center gap-2 text-center md:flex-row md:items-start md:gap-3 md:text-left">
+              <Icon size={24} className="shrink-0 text-rose-deep" aria-hidden />
               <span>
-                <span className="block text-[14px] font-semibold text-ink">
-                  {title}
-                </span>
-                <span className="block text-[13px] text-ink/60">{sub}</span>
+                <span className="block text-[13.5px] font-semibold text-ink md:text-[14.5px]">{title}</span>
+                <span className="block text-[12.5px] leading-snug text-ink/60 md:text-[13.5px]">{sub}</span>
               </span>
             </li>
           ))}
@@ -228,7 +200,7 @@ export function HomeView({ settings, specials, items, categories }: HomeData) {
             <div
               key={step.title}
               style={{ "--i": i } as React.CSSProperties}
-              className="border-t border-ink/15 pt-5"
+              className="border-t-[1.5px] border-dashed border-rose-mid/70 pt-5"
             >
               <span className="font-display text-[15px] italic text-rose-deep">
                 0{i + 1}
@@ -291,7 +263,7 @@ export function HomeView({ settings, specials, items, categories }: HomeData) {
 
       {/* ---------- custom cakes ---------- */}
       <Reveal>
-        <section className="mt-5 flex flex-col items-start gap-5 rounded-[16px] bg-lav px-6 py-9 md:mt-24 md:flex-row md:items-center md:justify-between md:px-12 md:py-12">
+        <section className="mt-5 flex flex-col items-start gap-5 rounded-[16px] border-[1.5px] border-dashed border-rose-mid bg-surface px-6 py-9 md:mt-24 md:flex-row md:items-center md:justify-between md:px-12 md:py-12">
           <div>
             <h2 className="text-[26px] leading-tight md:text-[34px]">
               Planning a celebration?
