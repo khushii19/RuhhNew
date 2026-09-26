@@ -39,10 +39,11 @@ export function ProductCard({
   const action = "press absolute bottom-2.5 right-2.5 flex h-11 w-11 items-center justify-center rounded-full shadow-[0_10px_22px_-10px_rgba(44,26,26,0.55)] transition";
 
   return (
-    <article className="group">
+    // A soft pink card with the dashed rose edge used across the site.
+    <article className="group flex h-full flex-col rounded-[18px] border-[1.5px] border-dashed border-rose-mid/60 bg-rose/60 p-2 transition-colors duration-300 hover:bg-rose">
       <div className="relative">
         <button type="button" tabIndex={-1} aria-hidden onClick={onOpen} className="block w-full">
-          <div className={`relative aspect-square overflow-hidden rounded-[18px] ${TILE_BG[index % 4]}`}>
+          <div className={`relative aspect-square overflow-hidden rounded-[12px] ${TILE_BG[index % 4]}`}>
             <Photo
               src={m.image_url ?? artUrl}
               alt=""
@@ -71,7 +72,7 @@ export function ProductCard({
             )}
       </div>
 
-      <button type="button" onClick={onOpen} className="mt-2.5 block w-full px-0.5 text-left outline-offset-4">
+      <button type="button" onClick={onOpen} className="mt-2.5 block w-full flex-1 px-1.5 pb-1.5 text-left outline-offset-4">
         <span className="line-clamp-2 font-display text-[16px] leading-snug text-ink transition-colors group-hover:text-rose-deep md:text-[17px]">{m.name}</span>
         <span className="price mt-1 block text-[13.5px] text-ink/75">
           {unpriced ? (

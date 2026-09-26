@@ -12,7 +12,7 @@ export function HomeBestsellers({ items, categories, settings }: { items: MenuIt
   const shop = useQuickAdd(categories, settings);
   return (
     <>
-      <RevealGroup className="grid grid-cols-2 gap-x-3 gap-y-7 md:grid-cols-4 md:gap-x-5">
+      <RevealGroup className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
         {items.map((m, i) => (
           <div key={m.id} style={{ "--i": i } as React.CSSProperties}>
             <ProductCard
