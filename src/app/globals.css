@@ -135,6 +135,11 @@ body {
   .label {
     @apply mb-1.5 block text-[13px] font-medium text-ink/80;
   }
+  /* Prices: Playfair and DM Sans default to old-style figures, which make
+     "AED 85" dip and wobble in columns. */
+  .price {
+    font-variant-numeric: lining-nums tabular-nums;
+  }
   .tag {
     @apply inline-block rounded-full px-2 py-0.5 text-[10px] font-bold;
   }
@@ -267,8 +272,12 @@ h3,
   }
 }
 
+/* Entry animations whose end state is the element's natural state fill
+   backwards only: a forwards fill keeps an identity transform alive, which
+   turns the wrapper into the containing block for any fixed descendant
+   (toasts, sheets) and a stacking context under the sticky header. */
 .m-fade-up {
-  animation: fade-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: fade-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 .m-fade-in {
   animation: fade-in 0.3s ease-out both;
@@ -293,7 +302,7 @@ h3,
 }
 /* Stagger children: set --i on each child (inline style) */
 .m-stagger > * {
-  animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
   animation-delay: calc(var(--i, 0) * 45ms);
 }
 .m-delay-1 {
@@ -395,7 +404,7 @@ h3,
   transform: translateY(14px);
 }
 .reveal-shown {
-  animation: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 /* ---------- hero ---------- */

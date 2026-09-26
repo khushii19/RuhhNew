@@ -18,7 +18,7 @@ export function CartBar() {
           <span key={count} className="m-pop flex h-6 min-w-6 items-center justify-center rounded-full bg-on-accent px-1.5 text-[11px] font-bold text-rose-deep">
             {count}
           </span>
-          {count === 1 ? "item" : "items"} in your box
+          {count === 1 ? "item" : "items"} in your basket
         </span>
         <span className="flex items-center gap-2 text-[13px] font-bold">
           {aed(subtotal)} <span aria-hidden>→</span>

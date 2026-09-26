@@ -21,7 +21,7 @@ export function SectionHead({
   return (
     <div className="mb-7 flex items-end justify-between gap-4 md:mb-10">
       <div>
-        {eyebrow && <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-rose-clay">{eyebrow}</p>}
+        {eyebrow && <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-rose-deep">{eyebrow}</p>}
         <h2 id={id} className="text-[30px] leading-[1.1] tracking-[-0.01em] md:text-[40px]">
           {title}
         </h2>

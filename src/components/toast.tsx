@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 
 export function Toast({ message, onDone }: { message: string | null; onDone: () => void }) {
   useEffect(() => {
@@ -9,7 +10,9 @@ export function Toast({ message, onDone }: { message: string | null; onDone: () 
     return () => clearTimeout(t);
   }, [message, onDone]);
   if (!message) return null;
-  return (
+  // Portalled to <body> so no animated or transformed ancestor can become
+  // its containing block and pin it inside a card.
+  return createPortal(
     <div
       role="status"
       aria-live="polite"
@@ -19,6 +22,7 @@ export function Toast({ message, onDone }: { message: string | null; onDone: () 
         <path d="M5 12l5 5L20 7" className="check-draw" />
       </svg>
       <span className="truncate">{message}</span>
-    </div>
+    </div>,
+    document.body,
   );
 }

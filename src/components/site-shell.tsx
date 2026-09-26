@@ -11,9 +11,12 @@ export function SiteShell({ settings, children }: { settings: Settings; children
   return (
     <CartProvider>
       <div className="flex min-h-[100dvh] flex-col">
-        <p className="bg-ink px-5 py-2 text-center text-[11.5px] tracking-[0.06em] text-cream/85">
+        {/* Fixed colours, not theme tokens: a light strip over the dark theme
+            reads as a glitch. Hidden on phones, where the tab bar and header
+            already take enough of the screen. */}
+        <p className="hidden bg-[#2c1a1a] px-5 py-2 text-center text-[11.5px] tracking-[0.06em] text-[#fbf7f2]/85 md:block">
           Handmade to order in Dubai
-          <span className="mx-2 text-cream/40" aria-hidden>
+          <span className="mx-2 text-[#fbf7f2]/40" aria-hidden>
             ·
           </span>
           Order {settings.default_lead_time_hours} hours ahead
@@ -21,10 +24,10 @@ export function SiteShell({ settings, children }: { settings: Settings; children
         <header className="sticky top-0 z-40 border-b border-line bg-cream/92 backdrop-blur-md">
           {/* Nav, centred logo, cart: the boutique arrangement on desktop.
               Phones keep logo and cart; sections live in the tab bar. */}
-          <div className="mx-auto grid h-16 max-w-6xl grid-cols-[1fr_auto] items-center px-5 md:h-[84px] md:grid-cols-[1fr_auto_1fr] md:px-8">
+          <div className="mx-auto grid h-14 max-w-6xl grid-cols-[1fr_auto] items-center px-5 md:h-[84px] md:grid-cols-[1fr_auto_1fr] md:px-8">
             <DesktopNav />
             <Link href="/" className="flex items-center md:justify-self-center" aria-label={`${settings.business_name} home`}>
-              <BrandLogo url={settings.logo_url} height={46} />
+              <BrandLogo url={settings.logo_url} height={38} variant="wordmark" />
             </Link>
             <div className="justify-self-end">
               <CartPill />
@@ -59,7 +62,7 @@ function SiteFooter({ settings }: { settings: Settings }) {
         <FooterCol title="Shop">
           <Link href="/menu" className={linkCls}>Menu</Link>
           <Link href="/custom-cakes" className={linkCls}>Custom cakes</Link>
-          <Link href="/order" className={linkCls}>Your cart</Link>
+          <Link href="/order" className={linkCls}>Your basket</Link>
         </FooterCol>
 
         <FooterCol title="Help">
@@ -99,9 +102,6 @@ function SiteFooter({ settings }: { settings: Settings }) {
           </span>
           <span className="flex items-center gap-4">
             <ThemeToggle />
-            <Link href="/admin" className="text-muted/50" aria-label="Admin">
-              ·
-            </Link>
           </span>
         </div>
       </div>

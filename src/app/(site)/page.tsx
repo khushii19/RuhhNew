@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Fragment } from "react";
 import {
   categoryCover,
+  getApprovedReviews,
   getCategories,
   getFeatured,
   getMenu,
@@ -17,7 +18,9 @@ import { SpecialCard } from "@/components/special-card";
 import { WhatsAppButton } from "@/components/whatsapp-button";
 import { Signature } from "@/components/brand-logo";
 import { SectionHead } from "@/components/section-head";
-import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
+import { ArrowRight, Star } from "@phosphor-icons/react/dist/ssr";
+import { MenuUnavailable } from "@/components/menu-unavailable";
+import { CartBar } from "@/components/cart-bar";
 import { Reveal } from "@/components/reveal";
 
 export const revalidate = 60;
@@ -32,10 +35,24 @@ const HEADLINE_EM = ["making", "room", "for."];
 const COLUMN_START = "md:pl-[max(2rem,calc((100vw-72rem)/2+2rem))]";
 
 export default async function HomePage() {
-  const [settings, specials, items, categories] = await Promise.all([getSettings(), getSpecials(), getMenu(), getCategories()]);
+  const [settings, specials, items, categories, reviews] = await Promise.all([
+    getSettings(),
+    getSpecials(),
+    getMenu(),
+    getCategories(),
+    getApprovedReviews(200),
+  ]);
   const first = settings.owner_name;
-  const featured = getFeatured(items, 4);
+  // Each section shows different bakes: favourites skip this week's
+  // specials, and category covers skip every photo shown in either.
+  const specialNames = new Set(specials.map((s) => s.name.trim().toLowerCase()));
+  const featured = getFeatured(
+    items.filter((m) => !specialNames.has(m.name.trim().toLowerCase())),
+    4,
+  );
+  const shown = new Set([...featured, ...specials].map((x) => x.image_url).filter((u): u is string => Boolean(u)));
   const cats = categories.filter((c) => items.some((i) => i.category_id === c.id));
+  const rating = reviews.length ? reviews.reduce((a, r) => a + r.rating, 0) / reviews.length : 0;
 
   return (
     <>
@@ -52,6 +69,7 @@ export default async function HomePage() {
           />
         </div>
         <div className={`m-fade-up flex flex-col justify-center px-5 py-10 md:py-16 md:pr-12 ${COLUMN_START}`}>
+          <p className="mb-5 text-[12px] font-semibold uppercase tracking-[0.22em] text-rose-deep">Home bakery · Dubai</p>
           <h1 className="words pb-2 text-[42px] leading-[1.06] tracking-[-0.02em] sm:text-[52px] lg:text-[64px]">
             {/* The stagger spans are inline-block, which trims a space inside
                 them, so the gaps sit between spans. */}
@@ -77,8 +95,22 @@ export default async function HomePage() {
               Custom cakes
             </Link>
           </div>
+          {reviews.length > 0 && (
+            <Link href="/reviews" className="mt-8 inline-flex items-center gap-1.5 self-start text-[13.5px] text-muted transition-colors hover:text-rose-deep">
+              <Star size={15} weight="fill" className="text-peach-mid" aria-hidden />
+              <span className="price font-semibold text-ink">{rating.toFixed(1)}</span>
+              <span aria-hidden>·</span>
+              {reviews.length} {reviews.length === 1 ? "review" : "reviews"}
+            </Link>
+          )}
         </div>
       </section>
+
+      {items.length === 0 && (
+        <div className="pt-16 md:pt-24">
+          <MenuUnavailable ownerName={first} whatsappNumber={settings.whatsapp_number} />
+        </div>
+      )}
 
       {/* ---------- categories ---------- */}
       {cats.length > 0 && (
@@ -95,7 +127,7 @@ export default async function HomePage() {
                 >
                   <div className={`relative aspect-[4/5] overflow-hidden rounded-[14px] ${PASTELS[i % PASTELS.length]}`}>
                     <Photo
-                      src={categoryCover(items, c.id) ?? categoryArt(c.name)}
+                      src={categoryCover(items, c.id, shown) ?? categoryArt(c.name)}
                       alt=""
                       fill
                       sizes="(max-width: 768px) 42vw, 230px"
@@ -105,38 +137,6 @@ export default async function HomePage() {
                   <div className="mt-3 font-display text-[17px] leading-tight transition-colors group-hover:text-rose-deep md:text-[19px]">{c.name}</div>
                 </Link>
               ))}
-            </div>
-          </section>
-        </Reveal>
-      )}
-
-      {/* ---------- favourites ---------- */}
-      {featured.length > 0 && (
-        <Reveal>
-          <section className="pt-16 md:pt-24">
-            <SectionHead title="Favourites" />
-            <div className="m-stagger grid grid-cols-2 gap-x-4 gap-y-9 md:gap-x-6 lg:grid-cols-4">
-              {featured.map((m, i) => {
-                const cat = categories.find((c) => c.id === m.category_id);
-                return (
-                  <Link key={m.id} href={`/menu?cat=${m.category_id ?? ""}`} style={{ "--i": i } as React.CSSProperties} className="group">
-                    <div className={`relative aspect-[4/5] overflow-hidden rounded-[14px] ${PASTELS[i % PASTELS.length]}`}>
-                      <Photo
-                        src={m.image_url ?? categoryArt(cat?.name)}
-                        alt={m.name}
-                        fill
-                        sizes="(max-width: 1024px) 50vw, 270px"
-                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-                      />
-                    </div>
-                    <div className="mt-3.5 font-display text-[17px] leading-snug transition-colors group-hover:text-rose-deep md:text-[18px]">{m.name}</div>
-                    <div className="mt-1 text-[13.5px] text-muted">
-                      {itemHasOptions(m) && "From "}
-                      {aed(itemMinPrice(m))}
-                    </div>
-                  </Link>
-                );
-              })}
             </div>
           </section>
         </Reveal>
@@ -153,6 +153,38 @@ export default async function HomePage() {
                   <SpecialCard special={s} leadTimeHours={settings.default_lead_time_hours} />
                 </div>
               ))}
+            </div>
+          </section>
+        </Reveal>
+      )}
+
+      {/* ---------- favourites ---------- */}
+      {featured.length > 0 && (
+        <Reveal>
+          <section className="pt-16 md:pt-24">
+            <SectionHead title="Favourites" />
+            <div className="m-stagger grid grid-cols-2 gap-x-4 gap-y-9 md:gap-x-6 lg:grid-cols-4">
+              {featured.map((m, i) => {
+                const cat = categories.find((c) => c.id === m.category_id);
+                return (
+                  <Link key={m.id} href={`/menu?item=${m.id}`} style={{ "--i": i } as React.CSSProperties} className="group">
+                    <div className={`relative aspect-[4/5] overflow-hidden rounded-[14px] ${PASTELS[i % PASTELS.length]}`}>
+                      <Photo
+                        src={m.image_url ?? categoryArt(cat?.name)}
+                        alt={m.name}
+                        fill
+                        sizes="(max-width: 1024px) 50vw, 270px"
+                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                      />
+                    </div>
+                    <div className="mt-3.5 font-display text-[17px] leading-snug transition-colors group-hover:text-rose-deep md:text-[18px]">{m.name}</div>
+                    <div className="price mt-1 text-[13.5px] text-muted">
+                      {itemHasOptions(m) && "From "}
+                      {aed(itemMinPrice(m))}
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </section>
         </Reveal>
@@ -175,15 +207,13 @@ export default async function HomePage() {
               <h2 id="about-title" className="text-[32px] leading-[1.1] tracking-[-0.01em] md:text-[42px]">
                 Hello, I&rsquo;m {first}
               </h2>
-              <div className="mt-6">
-                <Signature size={92} />
-              </div>
+              {settings.about_text && <p className="mt-5 line-clamp-2 max-w-[38ch] text-[16px] leading-relaxed text-muted">{settings.about_text}</p>}
               <WhatsAppButton
                 number={settings.whatsapp_number}
                 message={`Hi ${first}! I found ${settings.business_name} and would love to know more.`}
-                className="press mt-6 inline-flex items-center gap-2 rounded-full bg-[#15803d] px-5 py-3 text-[14px] font-semibold text-white transition hover:brightness-110"
+                className="press mt-7 inline-flex items-center gap-2 rounded-full bg-[#15803d] px-5 py-3 text-[14px] font-semibold text-white transition hover:brightness-110"
               >
-                Say hello
+                Message {first}
               </WhatsAppButton>
             </div>
           </div>
@@ -203,6 +233,7 @@ export default async function HomePage() {
           </div>
         </section>
       </Reveal>
+      <CartBar />
     </>
   );
 }

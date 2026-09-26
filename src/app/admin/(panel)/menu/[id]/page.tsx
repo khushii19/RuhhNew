@@ -46,6 +46,10 @@ export default async function EditItemPage({ params, searchParams }: { params: P
             <label className="label">Short description</label>
             <input name="description" defaultValue={m.description} className="admin-input" />
           </div>
+          <div className="mt-3">
+            <label className="label">Allergens (shown to customers)</label>
+            <input name="allergens" defaultValue={m.allergens ?? ""} placeholder="e.g. Nuts, gluten, dairy, eggs" className="admin-input" />
+          </div>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             <div>
               <label className="label">Category</label>

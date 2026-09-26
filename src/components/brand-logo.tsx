@@ -5,15 +5,19 @@ import { Photo } from "@/components/photo";
  * otherwise the Ruhh wordmark lockup shipped with the app, in a light or
  * dark variant depending on the active theme.
  */
-export function BrandLogo({ url, height = 44 }: { url: string | null; height?: number }) {
+export function BrandLogo({ url, height = 44, variant = "lockup" }: { url: string | null; height?: number; variant?: "lockup" | "wordmark" }) {
   if (url) {
     return <Photo src={url} alt="Ruhh" width={height * 3} height={height} className="w-auto object-contain" style={{ height }} priority />;
   }
-  const w = Math.round(height * 3.4);
+  // The wordmark drops the "baked to perfection" line, which is unreadable
+  // at header size; the full lockup is for larger placements.
+  const file = variant === "wordmark" ? "ruhh-wordmark" : "ruhh-lockup";
+  const alt = variant === "wordmark" ? "Ruhh" : "Ruhh. Baked to perfection, est. 2019";
+  const w = Math.round(height * (variant === "wordmark" ? 3.83 : 3.4));
   return (
     <>
-      <Photo src="/brand/ruhh-lockup.svg" alt="Ruhh. Baked to perfection, est. 2019" width={w} height={height} style={{ height, width: "auto" }} className="only-light" priority />
-      <Photo src="/brand/ruhh-lockup-dark.svg" alt="Ruhh. Baked to perfection, est. 2019" width={w} height={height} style={{ height, width: "auto" }} className="only-dark" priority />
+      <Photo src={`/brand/${file}.svg`} alt={alt} width={w} height={height} style={{ height, width: "auto" }} className="only-light" priority />
+      <Photo src={`/brand/${file}-dark.svg`} alt={alt} width={w} height={height} style={{ height, width: "auto" }} className="only-dark" priority />
     </>
   );
 }

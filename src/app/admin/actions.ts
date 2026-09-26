@@ -149,6 +149,14 @@ export async function saveMenuItem(fd: FormData) {
     })
     .eq("id", id);
 
+  // Separate write so a database that has not run migration 0004 yet still
+  // saves everything else; only the allergen note is lost there.
+  const { error: allergenError } = await db
+    .from("menu_items")
+    .update({ allergens: str(fd, "allergens") || null })
+    .eq("id", id);
+  if (allergenError) console.warn("allergens not saved (run migration 0004?)", allergenError.message);
+
   // Sizes: rows arrive as size_label[], size_count[], size_price[], size_id[]
   const labels = fd.getAll("size_label").map(String);
   const counts = fd.getAll("size_count").map(String);

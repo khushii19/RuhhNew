@@ -47,6 +47,7 @@ integration for automated status messages.
    - `supabase/migrations/0001_init.sql`
    - `supabase/migrations/0002_photos_featured.sql`
    - `supabase/migrations/0003_operations.sql`
+   - `supabase/migrations/0004_allergens.sql`
    - `supabase/seed.sql` — **first edit the last statement** to Shweta's real
      email (the first admin), and optionally the WhatsApp number / Instagram /
      pickup address in the first `update settings` block.

@@ -135,9 +135,14 @@ export function getFeatured(items: MenuItem[], n = 4): MenuItem[] {
   return [...featured, ...withPhoto].slice(0, n);
 }
 
-/** One representative image per category (first item with a photo). */
-export function categoryCover(items: MenuItem[], categoryId: string): string | null {
-  return items.find((m) => m.category_id === categoryId && m.image_url)?.image_url ?? null;
+/**
+ * One representative image per category. Prefers a photo not in `exclude`
+ * (photos already shown elsewhere on the page), so the home page does not
+ * repeat the same bake in several sections; falls back to any photo.
+ */
+export function categoryCover(items: MenuItem[], categoryId: string, exclude: ReadonlySet<string> = new Set()): string | null {
+  const photos = items.filter((m) => m.category_id === categoryId && m.image_url).map((m) => m.image_url!);
+  return photos.find((u) => !exclude.has(u)) ?? photos[0] ?? null;
 }
 
 export function categoryLeadTime(cat: Category | undefined, settings: Settings) {

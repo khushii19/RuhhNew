@@ -29,7 +29,9 @@ export function lineDisplay(l: CartLine) {
 export function Checkout({ settings, zones }: { settings: Settings; zones: DeliveryZone[] }) {
   const cart = useCart();
   const [mode, setMode] = useState<"delivery" | "pickup">("delivery");
-  const [zoneId, setZoneId] = useState(zones[0]?.id ?? "");
+  // No area preselected: a default would quietly price delivery for a zone
+  // the customer may not live in.
+  const [zoneId, setZoneId] = useState("");
   const [address, setAddress] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -41,7 +43,8 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
   const [giftMessage, setGiftMessage] = useState("");
   const [payment, setPayment] = useState<"cash" | "bank_transfer">(settings.accept_cash ? "cash" : "bank_transfer");
   const [waUpdates, setWaUpdates] = useState(true);
-  const [marketing, setMarketing] = useState(true);
+  // Marketing is opt-in; order updates are transactional and stay on.
+  const [marketing, setMarketing] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [placed, setPlaced] = useState<PlacedOrder | null>(null);
@@ -169,7 +172,7 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
     return (
       <div className="rounded-[14px] border border-dashed border-line px-6 py-14 text-center">
         <Basket size={36} className="mx-auto text-rose-clay" aria-hidden />
-        <p className="mt-4 font-display text-[22px]">Your cart is empty</p>
+        <p className="mt-4 font-display text-[22px]">Your basket is empty</p>
         <p className="mx-auto mt-2 max-w-[36ch] text-[14.5px] leading-relaxed text-muted">Pick something from the menu and it will wait for you here.</p>
         <Link href="/menu" className="btn-p press mt-6 px-7 py-3.5 text-[14.5px] font-semibold">
           Browse the menu
@@ -180,7 +183,6 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
 
   return (
     <>
-      <h2 className="sec-head">Your cart</h2>
       <div className="mb-4">
         {cart.lines.map((l) => (
           <div key={l.key} className="card m-fade-up mb-2.5 flex items-center gap-4 p-3">
@@ -206,22 +208,18 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
       </div>
 
       <div className="mb-8 rounded-[14px] bg-cream2 p-5 text-[13.5px]">
-        {cart.lines.map((l) => (
-          <div key={l.key} className="flex justify-between py-0.5">
-            <span>
-              {l.name}
-              {lineDisplay(l) ? ` (${lineDisplay(l)})` : ""} ×{l.qty}
-            </span>
-            <span>{aed(l.unitPrice * l.qty)}</span>
-          </div>
-        ))}
+        {/* Items are listed above; the summary only adds up. */}
+        <div className="flex justify-between py-0.5">
+          <span>Subtotal</span>
+          <span className="price">{aed(cart.subtotal)}</span>
+        </div>
         <div className="flex justify-between py-0.5">
           <span>Delivery</span>
-          <span>{mode === "pickup" ? "Free (pickup)" : deliveryFee ? aed(deliveryFee) : zone ? "Free" : "-"}</span>
+          <span className="price">{mode === "pickup" ? "Free (pickup)" : deliveryFee ? aed(deliveryFee) : zone ? "Free" : "Choose area"}</span>
         </div>
         <div className="mt-2 flex justify-between border-t border-line pt-3 text-[16px] font-semibold text-ink">
           <span>Total</span>
-          <span>{aed(total)}</span>
+          <span className="price">{aed(total)}</span>
         </div>
       </div>
 
@@ -249,6 +247,9 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
         <>
           <Field label="Delivery area" error={errors.zone}>
             <select className={`field ${errors.zone ? "field-err" : ""}`} value={zoneId} onChange={(e) => setZoneId(e.target.value)}>
+              <option value="" disabled>
+                Choose your area
+              </option>
               {zones.map((z) => (
                 <option key={z.id} value={z.id}>
                   {z.name}: {aed(z.fee_aed)}
@@ -274,14 +275,18 @@ export function Checkout({ settings, zones }: { settings: Settings; zones: Deliv
 
       <h2 className="sec-head">Pick a date &amp; time</h2>
       {cart.leadHours > 0 && (
-        <p className="mb-2 text-[11px] text-muted">Items in your cart need {cart.leadHours} hours notice, so the earliest date is shown first.</p>
+        <p className="mb-2 text-[11px] text-muted">Items in your basket need {cart.leadHours} hours&rsquo; notice, so the earliest date is shown first.</p>
       )}
-      <div className="mb-2 flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {dates.map((d) => (
-          <button key={d} className={`chip shrink-0 ${slotDate === d ? "chip-sel" : ""}`} onClick={() => setSlotDate(d)}>
-            {fmtDate(d)}
-          </button>
-        ))}
+      {/* The right-edge fade signals that more dates scroll into view. */}
+      <div className="relative mb-2">
+        <div className="flex gap-1.5 overflow-x-auto pb-1 pr-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {dates.map((d) => (
+            <button key={d} className={`chip shrink-0 ${slotDate === d ? "chip-sel" : ""}`} onClick={() => setSlotDate(d)}>
+              {fmtDate(d)}
+            </button>
+          ))}
+        </div>
+        <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-cream to-transparent" />
       </div>
       {errors.date && <p className="mb-2 text-[11px] text-danger">{errors.date}</p>}
       <div className="mb-3 flex flex-wrap gap-1.5">

@@ -45,17 +45,19 @@ export function CartPill() {
   return (
     <Link
       href="/order"
-      className="press flex shrink-0 items-center gap-2 rounded-full border border-ink/15 py-1.5 pl-3.5 pr-1.5 text-[13px] text-ink transition hover:border-rose-deep hover:text-rose-deep"
-      aria-label={`View cart, ${hydrated ? count : 0} items`}
+      className={`press flex shrink-0 items-center gap-2 rounded-full border border-ink/15 py-1.5 pl-3.5 text-[13px] ${hydrated && count > 0 ? "pr-1.5" : "pr-4"} text-ink transition hover:border-rose-deep hover:text-rose-deep`}
+      aria-label={`View basket, ${hydrated ? count : 0} ${hydrated && count === 1 ? "item" : "items"}`}
     >
       <Basket size={17} aria-hidden />
-      Cart
-      <span
-        key={hydrated ? count : -1}
-        className={`flex h-[24px] min-w-[24px] items-center justify-center rounded-full bg-rose-deep px-1.5 text-[11px] font-bold text-on-accent ${hydrated && count > 0 ? "m-bump" : ""}`}
-      >
-        {hydrated ? count : 0}
-      </span>
+      Basket
+      {hydrated && count > 0 && (
+        <span
+          key={count}
+          className="price m-bump flex h-[24px] min-w-[24px] items-center justify-center rounded-full bg-rose-deep px-1.5 text-[11px] font-bold text-on-accent"
+        >
+          {count}
+        </span>
+      )}
     </Link>
   );
 }
@@ -63,7 +65,7 @@ export function CartPill() {
 const TABS = [
   { href: "/", label: "Home", Icon: House },
   { href: "/menu", label: "Menu", Icon: Cookie },
-  { href: "/order", label: "Order", Icon: Basket },
+  { href: "/order", label: "Basket", Icon: Basket },
   { href: "/track", label: "Track", Icon: Truck },
   { href: "/custom-cakes", label: "Custom", Icon: Cake },
 ];

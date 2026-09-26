@@ -69,6 +69,8 @@ export interface MenuItem {
   description: string;
   emoji: string;
   image_url: string | null;
+  /** Free-text allergen note (migration 0004); absent on older databases. */
+  allergens?: string | null;
   mixable: boolean;
   is_available: boolean;
   is_featured: boolean;
