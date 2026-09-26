@@ -1,14 +1,12 @@
 import { Photo } from "@/components/photo";
 import Link from "next/link";
-import { getApprovedReviews, getCategories, getFeatured, getMenu, getSettings, getSpecials } from "@/lib/data";
-import { availableDates } from "@/lib/availability";
+import { getCategories, getFeatured, getMenu, getSettings, getSpecials } from "@/lib/data";
 import { categoryArt } from "@/lib/category-art";
-import { fmtDate } from "@/lib/format";
 import { HomeShop } from "@/components/home-shop";
 import { MenuUnavailable } from "@/components/menu-unavailable";
 import { WhatsAppButton } from "@/components/whatsapp-button";
 import { Reveal } from "@/components/reveal";
-import { ArrowDown, CalendarBlank, Car, Star } from "@phosphor-icons/react/dist/ssr";
+import { ArrowDown, CalendarBlank, Car, Cookie } from "@phosphor-icons/react/dist/ssr";
 
 export const revalidate = 60;
 
@@ -16,13 +14,7 @@ export const revalidate = 60;
 const COLUMN = "mx-auto w-full max-w-6xl px-5 md:px-8";
 
 export default async function HomePage() {
-  const [settings, specials, items, categories, reviews] = await Promise.all([
-    getSettings(),
-    getSpecials(),
-    getMenu(),
-    getCategories(),
-    getApprovedReviews(200),
-  ]);
+  const [settings, specials, items, categories] = await Promise.all([getSettings(), getSpecials(), getMenu(), getCategories()]);
   const first = settings.owner_name;
   // Specials get their own row, so "Most loved" shows other bakes.
   const specialNames = new Set(specials.map((s) => s.name.trim().toLowerCase()));
@@ -30,8 +22,6 @@ export default async function HomePage() {
     items.filter((m) => !specialNames.has(m.name.trim().toLowerCase())),
     4,
   );
-  const rating = reviews.length ? reviews.reduce((a, r) => a + r.rating, 0) / reviews.length : 0;
-  const nextDate = availableDates(settings.default_lead_time_hours, settings, 14)[0];
   const heroSrc = settings.hero_image_url;
 
   return (
@@ -67,21 +57,6 @@ export default async function HomePage() {
             <p className="mt-3 max-w-[36ch] text-[15.5px] leading-relaxed text-[#5a3a3a] md:mt-4 md:text-[18px]">
               Homemade cookies, cheesecakes &amp; tiramisu from {first}&rsquo;s kitchen in Dubai.
             </p>
-            <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[14px] text-[#5a3a3a]">
-              {nextDate && (
-                <span className="flex items-center gap-1.5">
-                  <CalendarBlank size={16} aria-hidden />
-                  Earliest delivery: <span className="font-semibold text-[#2c1a1a]">{fmtDate(nextDate)}</span>
-                </span>
-              )}
-              {reviews.length > 0 && (
-                <Link href="/reviews" className="flex items-center gap-1.5 hover:text-[#9b4b6b]">
-                  <Star size={15} weight="fill" className="text-[#e8a870]" aria-hidden />
-                  <span className="price font-semibold text-[#2c1a1a]">{rating.toFixed(1)}</span>· {reviews.length}{" "}
-                  {reviews.length === 1 ? "review" : "reviews"}
-                </Link>
-              )}
-            </div>
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <a href="#bakes" className="press inline-flex items-center gap-2 rounded-full bg-[#9b4b6b] px-7 py-3.5 text-[14.5px] font-semibold text-white transition hover:brightness-110">
                 Order now <ArrowDown size={16} weight="bold" aria-hidden />
@@ -141,7 +116,7 @@ export default async function HomePage() {
         {[
           { Icon: CalendarBlank, text: `Order ${settings.default_lead_time_hours} hours ahead`, tint: "bg-lav text-lav-deep" },
           { Icon: Car, text: settings.pickup_address ? "Delivery or free pickup" : "Delivered across Dubai", tint: "bg-sage text-sage-deep" },
-          { Icon: Star, text: reviews.length ? `Rated ${rating.toFixed(1)} by customers` : "Made in small batches", tint: "bg-peach text-peach-deep" },
+          { Icon: Cookie, text: "Made in small batches", tint: "bg-peach text-peach-deep" },
         ].map(({ Icon, text, tint }) => (
           <div key={text} className="flex items-center gap-3 text-[14px] text-ink/85">
             <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${tint}`}>

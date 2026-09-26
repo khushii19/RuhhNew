@@ -36,3 +36,36 @@ describe("isSupabaseConfigured", () => {
     expect(await configuredWith("https://abc.supabase.co", undefined)).toBe(false);
   });
 });
+
+describe("env.siteUrl", () => {
+  const original = { ...process.env };
+  afterEach(() => {
+    process.env = { ...original };
+  });
+
+  async function siteUrlWith(site?: string, vercel?: string) {
+    vi.resetModules();
+    if (site === undefined) delete process.env.NEXT_PUBLIC_SITE_URL;
+    else process.env.NEXT_PUBLIC_SITE_URL = site;
+    if (vercel === undefined) delete process.env.VERCEL_PROJECT_PRODUCTION_URL;
+    else process.env.VERCEL_PROJECT_PRODUCTION_URL = vercel;
+    const { env } = await import("@/lib/env");
+    return env.siteUrl;
+  }
+
+  it("prefers the explicit setting", async () => {
+    expect(await siteUrlWith("https://ruhh.ae", "ruhh-new.vercel.app")).toBe("https://ruhh.ae");
+  });
+
+  it("falls back to Vercel's production domain", async () => {
+    expect(await siteUrlWith(undefined, "ruhh-new.vercel.app")).toBe("https://ruhh-new.vercel.app");
+  });
+
+  it("treats an empty setting as unset", async () => {
+    expect(await siteUrlWith("", "ruhh-new.vercel.app")).toBe("https://ruhh-new.vercel.app");
+  });
+
+  it("uses localhost outside Vercel", async () => {
+    expect(await siteUrlWith(undefined, undefined)).toBe("http://localhost:3000");
+  });
+});

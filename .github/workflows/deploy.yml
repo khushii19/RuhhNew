@@ -132,9 +132,9 @@ jobs:
             var="S_$name"; val="${!var:-}"
             if [ -n "$val" ]; then ARGS+=(-e "$name=$val" -b "$name=$val"); else missing+=("$name"); fi
           done
-          if [ -z "${S_NEXT_PUBLIC_SITE_URL:-}" ]; then
-            ARGS+=(-e "NEXT_PUBLIC_SITE_URL=https://$VERCEL_PROJECT.vercel.app" -b "NEXT_PUBLIC_SITE_URL=https://$VERCEL_PROJECT.vercel.app")
-          fi
+          # No NEXT_PUBLIC_SITE_URL secret: leave it to the Vercel project's own
+          # setting, or the app's fallback to Vercel's production domain. Forcing
+          # https://$VERCEL_PROJECT.vercel.app here named the wrong domain.
           if [ "$TARGET" = "production" ]; then ARGS+=(--prod); fi
           SCOPE_ARG=(); if [ -n "$VERCEL_SCOPE" ]; then SCOPE_ARG=(--scope "$VERCEL_SCOPE"); fi
 
