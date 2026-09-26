@@ -34,10 +34,11 @@ export function ProductCard({
   const flav = m.item_flavours.slice(0, 3).map((f) => f.name).join(", ") + (m.item_flavours.length > 3 ? "…" : "");
   const large = size === "large";
   return (
-    <div className="group flex flex-col">
+    // Each bake sits on a soft pastel pink card that deepens on hover.
+    <div className="group flex h-full flex-col rounded-[18px] bg-rose/45 p-2 pb-3.5 transition-colors duration-300 hover:bg-rose/80">
       <div className="relative">
         <button type="button" tabIndex={-1} aria-hidden onClick={onOpen} className="block w-full">
-          <div className={`relative aspect-[4/5] overflow-hidden rounded-[14px] ${TILE_BG[index % 4]}`}>
+          <div className={`relative aspect-[4/5] overflow-hidden rounded-[12px] ${TILE_BG[index % 4]}`}>
             <Photo
               src={m.image_url ?? artUrl}
               alt=""
@@ -69,7 +70,7 @@ export function ProductCard({
           </button>
         )}
       </div>
-      <button type="button" onClick={onOpen} className="mt-3.5 flex flex-1 flex-col rounded-[6px] text-left outline-offset-4">
+      <button type="button" onClick={onOpen} className="mt-3 flex flex-1 flex-col rounded-[6px] px-1.5 text-left outline-offset-4">
         <span className={`font-display leading-snug transition-colors group-hover:text-rose-deep ${large ? "text-[18px] md:text-[20px]" : "text-[16.5px] md:text-[18px]"}`}>
           {m.name}
         </span>

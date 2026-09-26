@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { CartBar } from "@/components/cart-bar";
 import { ProductCard } from "@/components/product-card";
 import { SpecialCard } from "@/components/special-card";
+import { RevealGroup } from "@/components/reveal";
 import { QuickAddLayer, useQuickAdd } from "@/components/use-quick-add";
 import { categoryArt } from "@/lib/category-art";
 import type { Category, MenuItem, Settings, Special } from "@/lib/types";
@@ -37,6 +38,18 @@ export function HomeShop({
   ];
   const [active, setActive] = useState(sections[0]?.id ?? "");
   const barRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const [stuck, setStuck] = useState(false);
+
+  // The pills bar gets a shadow once it has stuck under the header: a
+  // sentinel just above it leaves the viewport (past the header) at that point.
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(([e]) => setStuck(!e.isIntersecting), { rootMargin: "-90px 0px 0px 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   // Scroll-spy: the section crossing the upper-middle of the screen is active.
   const sectionKey = sections.map((s) => s.id).join("|");
@@ -75,8 +88,12 @@ export function HomeShop({
 
   return (
     <div id="bakes" className="scroll-mt-14 md:scroll-mt-[84px]">
-      {/* ---------- sticky section pills ---------- */}
-      <nav aria-label="Menu sections" className="bleed sticky top-14 z-30 border-b border-line bg-cream/95 backdrop-blur-md md:top-[84px]">
+      {/* ---------- sticky section pills: a pastel pink band ---------- */}
+      <div ref={sentinelRef} aria-hidden className="h-px" />
+      <nav
+        aria-label="Menu sections"
+        className={`bleed sticky top-14 z-30 bg-rose/95 backdrop-blur-md transition-shadow duration-300 md:top-[84px] ${stuck ? "pills-stuck" : ""}`}
+      >
         <div
           ref={barRef}
           className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-5 py-3 [scrollbar-width:none] md:px-8 [&::-webkit-scrollbar]:hidden"
@@ -89,7 +106,7 @@ export function HomeShop({
               aria-current={active === s.id ? "true" : undefined}
               onClick={() => setActive(s.id)}
               className={`shrink-0 rounded-full px-4 py-2 text-[13.5px] transition-colors ${
-                active === s.id ? "bg-ink font-semibold text-cream" : "bg-surface text-ink/80 ring-1 ring-line hover:text-rose-deep"
+                active === s.id ? "bg-rose-deep font-semibold text-on-accent" : "bg-surface text-ink/80 hover:text-rose-deep"
               }`}
             >
               {s.label}
@@ -104,13 +121,13 @@ export function HomeShop({
           <h2 id="most-loved-title" className="mb-6 text-[28px] leading-tight md:text-[36px]">
             Bestsellers
           </h2>
-          <div className="-mx-5 flex scroll-px-5 snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-2 [scrollbar-width:none] md:mx-0 md:grid md:grid-cols-4 md:gap-6 md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden">
+          <RevealGroup className="-mx-5 flex scroll-px-5 snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-2 [scrollbar-width:none] md:mx-0 md:grid md:grid-cols-4 md:gap-6 md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden">
             {featured.slice(0, 4).map((m, i) => (
-              <div key={m.id} className="w-[68vw] max-w-[280px] shrink-0 snap-start md:w-auto md:max-w-none">
+              <div key={m.id} style={{ "--i": i } as React.CSSProperties} className="w-[68vw] max-w-[280px] shrink-0 snap-start md:w-auto md:max-w-none">
                 {card(m, i, "large")}
               </div>
             ))}
-          </div>
+          </RevealGroup>
         </section>
       )}
 
@@ -120,11 +137,13 @@ export function HomeShop({
           <h2 id="this-week-title" className="mb-6 text-[28px] leading-tight md:text-[36px]">
             This week&rsquo;s specials
           </h2>
-          <div className="grid gap-4 md:grid-cols-2 md:gap-6">
-            {specials.map((s) => (
-              <SpecialCard key={s.id} special={s} leadTimeHours={settings.default_lead_time_hours} />
+          <RevealGroup className="grid gap-4 md:grid-cols-2 md:gap-6">
+            {specials.map((s, i) => (
+              <div key={s.id} style={{ "--i": i } as React.CSSProperties}>
+                <SpecialCard special={s} leadTimeHours={settings.default_lead_time_hours} />
+              </div>
             ))}
-          </div>
+          </RevealGroup>
         </section>
       )}
 
@@ -141,11 +160,13 @@ export function HomeShop({
                 {list.length} {list.length === 1 ? "bake" : "bakes"}
               </span>
             </div>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-9 md:grid-cols-4 md:gap-x-6 md:gap-y-12">
+            <RevealGroup className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4 md:gap-x-6 md:gap-y-10">
               {list.map((m, i) => (
-                <div key={m.id}>{card(m, i)}</div>
+                <div key={m.id} style={{ "--i": i } as React.CSSProperties}>
+                  {card(m, i)}
+                </div>
               ))}
-            </div>
+            </RevealGroup>
           </section>
         );
       })}
